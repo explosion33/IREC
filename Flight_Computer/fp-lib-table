@@ -1,0 +1,5 @@
+(fp_lib_table
+  (lib (name "USBC")(type "KiCad")(uri "${KIPRJMOD}/Components/USBC")(options "")(descr ""))
+  (lib (name "BMP280")(type "KiCad")(uri "${KIPRJMOD}/Components/BMP280")(options "")(descr ""))
+  (lib (name "LTC1690N8")(type "KiCad")(uri "${KIPRJMOD}/Components/LT1690/LTC1690N8.pretty")(options "")(descr ""))
+)

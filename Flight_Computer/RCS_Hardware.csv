@@ -1,0 +1,32 @@
+#,Reference,Qty,Value,Footprint,DNP,,,,,JLC
+1,"C1, C5, C6, C7, C8, C15, C16, C20, C23",9,100nF,Capacitor_SMD:C_0402_1005Metric,,,,,,C2168655
+2,"C2, C3",2,10pF,Capacitor_SMD:C_0402_1005Metric,,,,,,C2184799
+3,C4,1,10uF,Capacitor_SMD:C_0402_1005Metric,,,,,,C3847679
+4,"C9, C25",2,10nF,Capacitor_SMD:C_0402_1005Metric,,,,,,C1852910
+5,"C10, C11",2,1uF,Capacitor_SMD:C_0402_1005Metric,,,,,,C340321
+6,C12,1,2.2uF,Capacitor_SMD:C_0402_1005Metric,,,,,,C703697
+7,"C13, C14",2,22uF,Capacitor_SMD:C_0805_2012Metric,,,,,,C2911413
+8,"C17, C18",2,22pF,Capacitor_SMD:C_0402_1005Metric,,,,,,C2167234
+9,"C21, C24",2,0.1uF,Capacitor_SMD:C_0402_1005Metric,,,,,,C3847691
+10,C22,1,2.2nF,Capacitor_SMD:C_0402_1005Metric,,,,,,C387948
+11,"D1, D2, D3",3,LED,LED_SMD:LED_0603_1608Metric,,,,,,
+12,FB1,1,120R,Inductor_SMD:L_0603_1608Metric,,,,,,
+13,"H1, H2, H3, H4",4,MountingHole,MountingHole:MountingHole_3.2mm_M3,,,,,,
+14,J1,1,SWD,Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical,,,,,,
+15,J2,1,TYPE-C-31-M-12,USBC:HRO_TYPE-C-31-M-12,,,,,,
+16,"J3, J7",2,SPI,Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical,,,,,,
+17,J4,1,5V,TestPoint:TestPoint_THTPad_2.5x2.5mm_Drill1.2mm,,,,,,
+18,J5,1,GND,TestPoint:TestPoint_THTPad_2.5x2.5mm_Drill1.2mm,,,,,,
+19,J6,1,Solenoids,Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical,,,,,,
+20,J8,1,Conn_01x05_Male,Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical,,,,,,
+21,"R1, R2",2,5.11k,Resistor_SMD:R_0402_1005Metric,,,,,,C4122758
+22,"R3, R8, R9",3,1k,Resistor_SMD:R_0402_1005Metric,,,,,,C2130511
+23,"R4, R7",2,10k,Resistor_SMD:R_0402_1005Metric,,,,,,C2759773
+24,U1,1,STM32F401CCU6,Package_DFN_QFN:QFN-48-1EP_7x7mm_P0.5mm_EP5.6x5.6mm,,,,,,
+25,U2,1,AMS1117-3.3,Package_TO_SOT_SMD:SOT-223-3_TabPin2,,,,,,https://www.digikey.com/en/products/detail/umw/AMS1117-3-3/17635254
+26,U4,1,BNO055,Package_LGA:LGA-28_5.2x3.8mm_P0.5mm,,,,,,https://www.digikey.com/en/products/detail/bosch-sensortec/BNO055/6136301
+27,U5,1,W25Q32JVSS,Package_SO:SOIC-8_5.23x5.23mm_P1.27mm,,,,,,
+28,U6,1,MPU-6050,Sensor_Motion:InvenSense_QFN-24_4x4mm_P0.5mm,,,,,,https://www.sparkfun.com/products/10937
+29,U7,1,LTC1690N8,LTC1690N8:LTC1690N8,,,,,,https://www.digikey.com/en/products/detail/analog-devices-inc/LTC1690IN8-PBF/962720
+30,Y1,1,16MHz,Crystal:Crystal_SMD_3225-4Pin_3.2x2.5mm,,,,,,C2905346
+31,Y2,1,32.768Mhz,Crystal:Crystal_SMD_3215-2Pin_3.2x1.5mm,,,,,,C5120558

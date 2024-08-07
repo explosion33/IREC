@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name "TYPE-C-31-M-12")(type "KiCad")(uri "${KIPRJMOD}/Components/USBC/TYPE-C-31-M-12.kicad_sym")(options "")(descr ""))
+  (lib (name "BMP280")(type "KiCad")(uri "${KIPRJMOD}/Components/BMP280/BMP280.kicad_sym")(options "")(descr ""))
+  (lib (name "lt1690n8")(type "KiCad")(uri "${KIPRJMOD}/Components/LT1690/lt1690n8.kicad_sym")(options "")(descr ""))
+)
