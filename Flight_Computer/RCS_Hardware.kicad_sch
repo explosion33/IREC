@@ -9071,6 +9071,16 @@
 		)
 		(uuid 812701ec-279f-4878-b053-612fa11aeeb5)
 	)
+	(text "Add 3v3 circuit from ARES"
+		(exclude_from_sim no)
+		(at 341.376 127.508 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "1327947f-b488-4baa-8ec6-0f4f432b77d4")
+	)
 	(text "VDDA Filtering"
 		(exclude_from_sim no)
 		(at 110.998 34.29 0)
@@ -9092,6 +9102,16 @@
 			(justify left bottom)
 		)
 		(uuid "17e47184-289d-42e7-aa4b-119e08a8e6c7")
+	)
+	(text "Add ribbon connector"
+		(exclude_from_sim no)
+		(at 338.836 123.19 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "1cbfe8eb-b269-4a85-a8c4-a9173e816a90")
 	)
 	(text "FLASH STORAGE"
 		(exclude_from_sim no)
