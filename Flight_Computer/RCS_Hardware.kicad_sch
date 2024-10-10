@@ -8639,6 +8639,18 @@
 		(uuid 3d288ebf-8ca5-4d7a-bdd5-0af7bbdace2c)
 	)
 	(rectangle
+		(start 266.7 57.15)
+		(end 294.64 74.93)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid 75b48988-2c2f-4877-bfbd-52d2e9e92d6e)
+	)
+	(rectangle
 		(start 161.544 149.352)
 		(end 245.11 180.34)
 		(stroke
@@ -8714,6 +8726,16 @@
 			)
 		)
 		(uuid "6ff39bff-efb6-43be-a207-82abd6979945")
+	)
+	(text "Motor\n"
+		(exclude_from_sim no)
+		(at 270.256 72.898 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "74f0024b-e4db-43b2-8b62-2ea91c1370e2")
 	)
 	(text "1x 100nF per VDD pin"
 		(exclude_from_sim no)
