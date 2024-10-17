@@ -8737,6 +8737,16 @@
 		)
 		(uuid "74f0024b-e4db-43b2-8b62-2ea91c1370e2")
 	)
+	(text "Add new encoder pins"
+		(exclude_from_sim no)
+		(at 324.612 61.468 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "755db74b-ab87-4a23-94a9-1410786350ff")
+	)
 	(text "1x 100nF per VDD pin"
 		(exclude_from_sim no)
 		(at 55.372 35.56 0)
@@ -8770,6 +8780,16 @@
 		)
 		(uuid "8dbb409c-0604-4120-90cd-140bed3c504e")
 	)
+	(text "Change Battery Regulator to 5V\n"
+		(exclude_from_sim no)
+		(at 329.438 67.056 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "98b349f8-9536-4940-ba59-7100632d194a")
+	)
 	(text "Battery Regulator"
 		(exclude_from_sim no)
 		(at 162.56 179.578 0)
@@ -8780,6 +8800,16 @@
 			(justify left bottom)
 		)
 		(uuid "98f23ae8-a02c-4561-8fc4-5c82d10936d8")
+	)
+	(text "A/B to GPIO\n"
+		(exclude_from_sim no)
+		(at 320.294 64.262 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "9af635a2-4f56-4e25-8a67-115701f01ea7")
 	)
 	(text "BNO055"
 		(exclude_from_sim no)
