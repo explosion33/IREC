@@ -8822,6 +8822,16 @@
 		)
 		(uuid "a9f8c91a-c621-4cf6-a1da-af90eb57b1d6")
 	)
+	(text "24 V In\n"
+		(exclude_from_sim no)
+		(at 318.008 69.342 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "bb0e3eb2-185a-49f4-a2b3-01339bcd5255")
+	)
 	(text "POWER"
 		(exclude_from_sim no)
 		(at 161.036 144.78 0)
