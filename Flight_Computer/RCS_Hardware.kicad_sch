@@ -13885,7 +13885,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
+		(property "Value" "+BATT"
 			(at 180.34 133.35 0)
 			(effects
 				(font
