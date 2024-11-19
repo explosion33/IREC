@@ -15,7 +15,6 @@ class encoder:
         GPIO.setup(pin_b, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         
         GPIO.add_event_detect(pin_a, GPIO.BOTH, callback=self._encoder_callback)
-        GPIO.add_event_detect(pin_b, GPIO.BOTH, callback=self._encoder_callback)
     
     def _encoder_callback(self, channel):
         a_current = GPIO.input(self.pin_a)
@@ -30,12 +29,10 @@ class encoder:
                 self.last_a = a_current
 
         else:
-            if b_current != self.last_b:
-                if a_current == b_current:
-                    self.counter += 1
-                else:
                     self.counter -= 1
-                self.last_b = b_current
+            self.counter += 1
+        self.last_a = a_current
+        
     
     def get_position(self):
         return self.counter
@@ -49,7 +46,7 @@ class encoder:
 if __name__ == "__main__":
     try:
         # Initialize encoder with GPIO pins 17 and 18
-        encoder = encoder(pin_a=17, pin_b=18)
+        encoder = encoder(pin_a=14, pin_b=15)
         
         print("Monitoring encoder position. Press Ctrl+C to exit.")
         while True:
