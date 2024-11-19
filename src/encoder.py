@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 from time import sleep
 
 class encoder:
-    def __init__(self, pin_a, pin_b, counts_per_rev=64, gear_ratio = 50):
+    def __init__(self, pin_a, pin_b, counts_per_rev=64, gear_ratio = 1):
         self.pin_a = pin_a
         self.pin_b = pin_b
         self.counts_per_rev = counts_per_rev * gear_ratio
@@ -20,7 +20,7 @@ class encoder:
     def _encoder_callback(self, channel):
         a_current = GPIO.input(self.pin_a)
         b_current = GPIO.input(self.pin_b)
-        
+
         if channel == self.pin_a:
             if a_current != self.last_a:
                 if a_current == b_current:
@@ -28,7 +28,7 @@ class encoder:
                 else:
                     self.counter += 1
                 self.last_a = a_current
-        
+
         else:
             if b_current != self.last_b:
                 if a_current == b_current:
