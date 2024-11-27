@@ -8242,6 +8242,16 @@
 	)
 	(wire
 		(pts
+			(xy 45.72 208.28) (xy 57.15 208.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5845bb7c-3def-4bcd-a418-ecfae7c15203")
+	)
+	(wire
+		(pts
 			(xy 369.824 220.726) (xy 378.46 220.726)
 		)
 		(stroke
@@ -9049,16 +9059,6 @@
 			(type default)
 		)
 		(uuid "946800a8-52d7-45dd-8a3a-18dcdf612f41")
-	)
-	(wire
-		(pts
-			(xy 45.72 208.28) (xy 57.15 208.28)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "946eefde-e6af-4f11-9947-00090f3138fb")
 	)
 	(wire
 		(pts
@@ -11501,7 +11501,7 @@
 		(fields_autoplaced yes)
 		(uuid "0c9d698b-44c0-44a2-9b0d-31feec302202")
 		(property "Reference" "J3"
-			(at 120.269 192.278 0)
+			(at 120.269 191.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11509,14 +11509,14 @@
 			)
 		)
 		(property "Value" "I2C"
-			(at 120.269 194.818 0)
+			(at 120.269 194.31 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
 			(at 119.634 199.898 0)
 			(effects
 				(font
@@ -12609,7 +12609,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
 			(at 276.86 77.47 0)
 			(effects
 				(font
@@ -20949,7 +20949,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
 			(at 304.8 34.29 0)
 			(effects
 				(font
@@ -21224,7 +21224,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical"
 			(at 306.07 83.82 0)
 			(effects
 				(font
