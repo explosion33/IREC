@@ -1,4 +1,4 @@
-#include "mbed.h"
+,,#include "mbed.h"
 #include "BNO055.h"
 #include <map>
 DigitalOut rst(PA_5); // set reset pin
@@ -161,19 +161,19 @@ class BNO055 {
             return sign;
         }
         void setACCOffset(){
-            
+            return;
         }
 
         void setMAGOffset(){
-
+            return;
         }
 
         void setGYRPOffset(){
-
+            return;
         }
 
         void setRadius(){
-
+            return;
         }
 
 
