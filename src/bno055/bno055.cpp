@@ -1,4 +1,4 @@
-,,#include "mbed.h"
+#include "mbed.h"
 #include "BNO055.h"
 #include <map>
 DigitalOut rst(PA_5); // set reset pin
@@ -34,7 +34,7 @@ class BNO055 {
         }
 
         void wait(float time_ms) {
-            wait_us(time_ms * 1000);
+            ThisThread::sleep_for(time_ms); // todo: fix this 
         }
 
         void setPWR(PWRMode mode) {
