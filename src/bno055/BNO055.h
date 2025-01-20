@@ -1,3 +1,5 @@
+#include <cstdint> // For std::uint16_t
+
 #define START_BYTE 0xAA
 #define RESPONSE_BYTE 0xBB
 #define ERROR_BYTE 0xEE
@@ -159,6 +161,13 @@
 #define BNO055_OPERATION_MODE_NDOF_FMC_OFF  0x0B
 #define BNO055_OPERATION_MODE_NDOF       0x0C
 
+static constexpr std::uint16_t accelScale       = 100;
+static constexpr std::uint16_t tempScale        = 1;
+static constexpr std::uint16_t angularRateScale = 16;
+static constexpr std::uint16_t eulerScale       = 16;
+static constexpr std::uint16_t magScale         = 16;
+static constexpr std::uint16_t quaScale         = (1 << 14); // 2^14
+
 enum class BNO055Result {
     Ok,
     SysErr,
@@ -177,4 +186,21 @@ enum class Axes {
     X,
     Y, 
     Z,
+};
+
+enum bno055_vector_type_t {
+  BNO055_VECTOR_ACCELEROMETER = 0x08,  // Default: m/s²
+  BNO055_VECTOR_MAGNETOMETER = 0x0E,   // Default: uT
+  BNO055_VECTOR_GYROSCOPE = 0x14,      // Default: rad/s
+  BNO055_VECTOR_EULER = 0x1A,          // Default: degrees
+  BNO055_VECTOR_QUATERNION = 0x20,     // No units
+  BNO055_VECTOR_LINEARACCEL = 0x28,    // Default: m/s²
+  BNO055_VECTOR_GRAVITY = 0x2E         // Default: m/s²
+};
+
+struct bno055_vector_t {
+    double w;
+    double x;
+    double y;
+    double z;
 };

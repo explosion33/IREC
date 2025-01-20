@@ -1,7 +1,7 @@
 #include "mbed.h"
 #include "BNO055.h"
 #include <map>
-#include "func.h"
+#include "func.h" 
 
 DigitalOut rst(PA_5); // set reset pin
 class BNO055 {
@@ -173,6 +173,86 @@ class BNO055 {
             return;
         }
 
+        void get_SysErr() {
+            setPage(0);
+            char err = 0x00;
+            readData(BNO055_SYS_ERR, &err, 1);
+
+            switch (err) {
+                case 0x00:
+                    printf("No error");
+                    break;
+                case 0x01:
+                    printf("Peripheral initialization error");
+                    break;
+                case 0x02:
+                    printf("System initialization error");
+                    break;
+                case 0x03:
+                    printf("Self test result failed");
+                    break;
+                case 0x04:
+                    printf("Register map value out of range");
+                    break;
+                case 0x05:
+                    printf("Register map address out of range");
+                    break;
+                case 0x06:
+                    printf("Register map write error");
+                    break;
+                case 0x07:
+                    printf("BNO low power mode not available for selected operation mode");
+                    break;
+                case 0x08:
+                    printf("Accelerometer power mode not available");
+                    break;
+                case 0x09:
+                    printf("Fusion algorithm configuration error");
+                    break;
+                case 0x0A:
+                    printf("Sensor configuration error");
+                    break;
+                default:
+                    printf("Unknown error code: 0x%02X", (unsigned char)err);
+                    break;
+            }
+            printf("\n");
+        }
+
+        void get_SysStatus() {
+            setPage(0);
+            char status = 0x00;
+
+            readData(BNO055_SYS_STATUS, &status, 1);
+
+            switch (status) {
+                case 0x00:
+                    printf("System idle");
+                    break;
+                case 0x01:
+                    printf("System Error");
+                    break;
+                case 0x02:
+                    printf("Initializing peripherals");
+                    break;
+                case 0x03:
+                    printf("System Initialization");
+                    break;
+                case 0x04:
+                    printf("Executing self test");
+                    break;
+                case 0x05:
+                    printf("Sensor fusion algorithm running");
+                    break;
+                case 0x06:
+                    printf("System running without fusion algorithm");
+                    break;
+                default:
+                    printf("Unknown system status: 0x%02X", (unsigned char)status);
+                    break;
+            }
+            printf("\n");
+        }
 
 
         BNO055Result checkCalibration(){
@@ -190,6 +270,18 @@ class BNO055 {
             } else {
                 return BNO055Result::Ok;
             }
+        }
+        
+        // todo: read calibration function
+
+
+        void runSelfTest(){
+            char set;
+            readData(BNO055_SYS_TRIGGER, &set, 1);
+            set |= 0x01;
+            writeData(BNO055_SYS_TRIGGER, &set, 1);
+            wait(20);
+
         }
 
         BNO055Result readSelfTest(){
@@ -211,15 +303,6 @@ class BNO055 {
             } else {
                 return BNO055Result::Ok;
             }
-        }
-
-        void runSelfTest(){
-            char set;
-            readData(BNO055_SYS_TRIGGER, &set, 1);
-            set |= 0x01;
-            writeData(BNO055_SYS_TRIGGER, &set, 1);
-            wait(20);
-
         }
 
         BNO055Result setup(){
@@ -249,7 +332,72 @@ class BNO055 {
             return BNO055Result::Ok;
         }
 
+        bno055_vector_t bno055_getVector(std::uint8_t vec) {
+            setPage(0);
 
-        // read sensor data
+            char buffer[8] = {0}; // quaternion needs 8
 
+            if (vec == BNO055_VECTOR_QUATERNION) {
+                readData(vec, buffer, 8);
+            } else {
+                readData(vec, buffer, 6);
+            }
+
+            double scale = 1.0;
+            if (vec == BNO055_VECTOR_MAGNETOMETER) {
+                scale = magScale;
+            } 
+            else if (vec == BNO055_VECTOR_ACCELEROMETER ||
+                    vec == BNO055_VECTOR_LINEARACCEL ||
+                    vec == BNO055_VECTOR_GRAVITY) {
+                scale = accelScale;
+            } 
+            else if (vec == BNO055_VECTOR_GYROSCOPE) {
+                scale = angularRateScale;
+            } 
+            else if (vec == BNO055_VECTOR_EULER) {
+                scale = eulerScale;
+            } 
+            else if (vec == BNO055_VECTOR_QUATERNION) {
+                scale = quaScale;
+            }
+
+            bno055_vector_t xyz{};
+            xyz.w = 0.0;
+
+            if (vec == BNO055_VECTOR_QUATERNION) {
+                xyz.w = static_cast<int16_t>((buffer[1] << 8) | buffer[0]) / scale;
+                xyz.x = static_cast<int16_t>((buffer[3] << 8) | buffer[2]) / scale;
+                xyz.y = static_cast<int16_t>((buffer[5] << 8) | buffer[4]) / scale;
+                xyz.z = static_cast<int16_t>((buffer[7] << 8) | buffer[6]) / scale;
+            } else {
+                xyz.x = static_cast<int16_t>((buffer[1] << 8) | buffer[0]) / scale;
+                xyz.y = static_cast<int16_t>((buffer[3] << 8) | buffer[2]) / scale;
+                xyz.z = static_cast<int16_t>((buffer[5] << 8) | buffer[4]) / scale;
+            }
+
+            return xyz;
+        }
+
+        bno055_vector_t bno055_getVectorAccelerometer() {
+            return bno055_getVector(BNO055_VECTOR_ACCELEROMETER);
+        }
+        bno055_vector_t bno055_getVectorMagnetometer() {
+            return bno055_getVector(BNO055_VECTOR_MAGNETOMETER);
+        }
+        bno055_vector_t bno055_getVectorGyroscope() {
+            return bno055_getVector(BNO055_VECTOR_GYROSCOPE);
+        }
+        bno055_vector_t bno055_getVectorEuler() {
+            return bno055_getVector(BNO055_VECTOR_EULER);
+        }
+        bno055_vector_t bno055_getVectorLinearAccel() {
+            return bno055_getVector(BNO055_VECTOR_LINEARACCEL);
+        }
+        bno055_vector_t bno055_getVectorGravity() {
+            return bno055_getVector(BNO055_VECTOR_GRAVITY);
+        }
+        bno055_vector_t bno055_getVectorQuaternion() {
+            return bno055_getVector(BNO055_VECTOR_QUATERNION);
+        }
 };
