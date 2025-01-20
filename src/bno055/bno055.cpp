@@ -1,8 +1,9 @@
 #include "mbed.h"
 #include "BNO055.h"
 #include <map>
-DigitalOut rst(PA_5); // set reset pin
+#include "func.h"
 
+DigitalOut rst(PA_5); // set reset pin
 class BNO055 {
     private:
         I2C* i2c;
@@ -31,10 +32,6 @@ class BNO055 {
         int writeData(uint8_t addr, char* data, uint8_t len){
             int err = i2c->write(addr, data, len);
             return err;
-        }
-
-        void wait(float time_ms) {
-            ThisThread::sleep_for(time_ms); // todo: fix this 
         }
 
         void setPWR(PWRMode mode) {
