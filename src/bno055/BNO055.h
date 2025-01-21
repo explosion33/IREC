@@ -1,4 +1,5 @@
 #include <cstdint> // For std::uint16_t
+#include "mbed.h"
 
 #define START_BYTE 0xAA
 #define RESPONSE_BYTE 0xBB
@@ -203,4 +204,51 @@ struct bno055_vector_t {
     double x;
     double y;
     double z;
+};
+
+class BNO055 {
+public:
+    BNO055(PinName SDA, PinName SCL);
+    BNO055(I2C* i2c);
+    ~BNO055();
+
+    BNO055Result setup();
+    BNO055Result stop();
+    bno055_vector_t bno055_getVectorAccelerometer();
+    bno055_vector_t bno055_getVectorMagnetometer();
+    bno055_vector_t bno055_getVectorGyroscope();
+    bno055_vector_t bno055_getVectorEuler();
+    bno055_vector_t bno055_getVectorLinearAccel();
+    bno055_vector_t bno055_getVectorGravity();
+    bno055_vector_t bno055_getVectorQuaternion();
+
+private:
+    I2C* i2c;
+    bool owned;
+    int readData(uint8_t addr, char* data, uint8_t len);
+    int writeData(uint8_t addr, char* data, uint8_t len);
+    void setPWR(PWRMode mode);
+    char getOPMode();
+    void setOPMode(char mode);
+    void setACC(char GRange, char Bandwidth, char OPMode);
+    void setGYR(char Range, char Bandwidth, char OPMode);
+    void setMAG(char Rate, char OPMode, char Power);
+    void setPage(uint8_t page);
+    void setCLK(bool external = false);
+    void setUnit(bool acc, bool angular, bool euler, bool temp, bool fusion);
+    void reset();
+    void nReset();
+    void setAxes(Axes newX, Axes newY, Axes newZ, bool xNeg = 0, bool yNeg = 0, bool zNeg = 0);
+    char getAxes(Axes newX, Axes newY, Axes newZ);
+    char getAxesSign(bool xNeg, bool yNeg, bool zNeg);
+    void setACCOffset();
+    void setMAGOffset();
+    void setGYRPOffset();
+    void setRadius();
+    void get_SysErr();
+    void get_SysStatus();
+    BNO055Result checkCalibration();
+    void runSelfTest();
+    BNO055Result readSelfTest();
+    bno055_vector_t bno055_getVector(std::uint8_t vec);
 };
