@@ -147,15 +147,19 @@ char BNO055::getAxesSign(bool xNeg, bool yNeg, bool zNeg) {
 }
 
 void BNO055::setACCOffset() {
+    // todo
 }
 
 void BNO055::setMAGOffset() {
+    // todo
 }
 
 void BNO055::setGYRPOffset() {
+    // todo
 }
 
 void BNO055::setRadius() {
+    // todo
 }
 
 void BNO055::get_SysErr() {
@@ -292,6 +296,9 @@ BNO055Result BNO055::setup() {
         return res;
     }
     setPage(0);
+
+    // todo: add additional settings
+
     return BNO055Result::Ok;
 }
 
