@@ -1,5 +1,6 @@
 #include <cstdint> // For std::uint16_t
 #include "mbed.h"
+#include "USBSerial.h"
 
 #define START_BYTE 0xAA
 #define RESPONSE_BYTE 0xBB
@@ -208,10 +209,11 @@ struct bno055_vector_t {
 
 class BNO055 {
 public:
-    BNO055(PinName SDA, PinName SCL);
+    BNO055(PinName SDA, PinName SCL, USBSerial* serial, char addr);
     BNO055(I2C* i2c);
     ~BNO055();
 
+    void dummy();
     BNO055Result setup();
     BNO055Result stop();
     bno055_vector_t bno055_getVectorAccelerometer();
@@ -221,11 +223,13 @@ public:
     bno055_vector_t bno055_getVectorLinearAccel();
     bno055_vector_t bno055_getVectorGravity();
     bno055_vector_t bno055_getVectorQuaternion();
+    int readData(char regaddr, char* data, uint8_t len);
 
 private:
     I2C* i2c;
     bool owned;
-    int readData(uint8_t addr, char* data, uint8_t len);
+    USBSerial* bnoserial;
+    char addr;
     int writeData(uint8_t addr, char* data, uint8_t len);
     void setPWR(PWRMode mode);
     char getOPMode();

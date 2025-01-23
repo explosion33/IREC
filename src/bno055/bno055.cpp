@@ -5,9 +5,11 @@
 
 DigitalOut rst(PA_5);
 
-BNO055::BNO055(PinName SDA, PinName SCL) {
+BNO055::BNO055(PinName SDA, PinName SCL, USBSerial* serial, char addr) {
     owned = true;
     i2c = new I2C(SDA, SCL);
+    bnoserial = serial;
+    addr = addr;
 }
 
 BNO055::BNO055(I2C* i2c) {
@@ -21,12 +23,24 @@ BNO055::~BNO055() {
     }
 }
 
-int BNO055::readData(uint8_t addr, char* data, uint8_t len) {
+void BNO055::dummy(){
+    
+    const char reg = 0x00;
+    i2c->write(0x29, &reg, 1);
+    char data;
+    int i = i2c->read(0x29, &data, 1);
+    bnoserial->printf("%d\n", data);
+    bnoserial->printf("%d\n", i);
+}
+
+int BNO055::readData(char regaddr, char* data, uint8_t len) {
+    const char reg =
+    i2c->write(addr, &reg, 1, true);
     return i2c->read(addr, data, len);
 }
 
 int BNO055::writeData(uint8_t addr, char* data, uint8_t len) {
-    return i2c->write(addr, data, len);
+    return i2c->write(addr, data, len); //todo: fix this to actually write to a register
 }
 
 void BNO055::setPWR(PWRMode mode) {
@@ -284,15 +298,16 @@ bno055_vector_t BNO055::bno055_getVector(uint8_t vec) {
 
 BNO055Result BNO055::setup() {
     reset();
-    char id = 0;
+    char id;
     readData(BNO055_CHIP_ID, &id, 1);
+    bnoserial->printf("%d", id);
     if (id != BNO055_ID) {
-        printf("Can't find BNO055");
+        bnoserial->printf("Can't find BNO055");
         return BNO055Result::SysErr;
     }
     BNO055Result res = readSelfTest();
     if (res != BNO055Result::Ok) {
-        printf("POST Error");
+        bnoserial->printf("POST Error");
         return res;
     }
     setPage(0);
