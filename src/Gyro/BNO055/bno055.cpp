@@ -7,9 +7,9 @@ DigitalOut rst(PA_5);
 
 BNO055::BNO055(PinName SDA, PinName SCL, USBSerial* serial, char addr) {
     owned = true;
-    i2c = new I2C(SDA, SCL);
-    bnoserial = serial;
-    addr = addr;
+    BNO055::i2c = new I2C(SDA, SCL);
+    BNO055::bnoserial = serial;
+    BNO055::addr = addr;
 }
 
 BNO055::BNO055(I2C* i2c) {
@@ -24,23 +24,24 @@ BNO055::~BNO055() {
 }
 
 void BNO055::dummy(){
-    
-    const char reg = 0x00;
-    i2c->write(0x29, &reg, 1);
-    char data;
-    int i = i2c->read(0x29, &data, 1);
-    bnoserial->printf("%d\n", data);
-    bnoserial->printf("%d\n", i);
+
 }
 
-int BNO055::readData(char regaddr, char* data, uint8_t len) {
-    const char reg =
-    i2c->write(addr, &reg, 1, true);
+int BNO055::readData(char regaddr, char* data, uint8_t len) { 
+    i2c->write(addr, &regaddr, 1);
     return i2c->read(addr, data, len);
 }
 
-int BNO055::writeData(uint8_t addr, char* data, uint8_t len) {
-    return i2c->write(addr, data, len); //todo: fix this to actually write to a register
+int BNO055::writeData(char regaddr, char* data, uint8_t len) {
+    char buffer[2];
+    buffer[0] = regaddr;
+    buffer[1] = *data;
+    return i2c->write(addr, data, len);
+
+}
+
+int BNO055::writeData(char regaddr, char * data, uint8_t len, bool repeat) {
+    return i2c->write(addr, data, len, repeat);
 }
 
 void BNO055::setPWR(PWRMode mode) {
@@ -259,7 +260,7 @@ BNO055Result BNO055::readSelfTest() {
     }
 }
 
-bno055_vector_t BNO055::bno055_getVector(uint8_t vec) {
+bno055_vector_t BNO055::bno055_getVector(uint8_t vec) { // doesn't work because of how our read data function works
     setPage(0);
     char buffer[8] = {0};
     if (vec == BNO055_VECTOR_QUATERNION) {
@@ -267,6 +268,7 @@ bno055_vector_t BNO055::bno055_getVector(uint8_t vec) {
     } else {
         readData(vec, buffer, 6);
     }
+    bnoserial->printf("%d", buffer[0]);
     double scale = 1.0;
     if (vec == BNO055_VECTOR_MAGNETOMETER) {
         scale = magScale;

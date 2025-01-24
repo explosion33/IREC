@@ -225,12 +225,12 @@ public:
     bno055_vector_t bno055_getVectorQuaternion();
     int readData(char regaddr, char* data, uint8_t len);
 
-private:
     I2C* i2c;
     bool owned;
     USBSerial* bnoserial;
     char addr;
-    int writeData(uint8_t addr, char* data, uint8_t len);
+    int writeData(char regaddr, char* data, uint8_t len);
+    int writeData(char regaddr, char * data, uint8_t len, bool repeat);
     void setPWR(PWRMode mode);
     char getOPMode();
     void setOPMode(char mode);
