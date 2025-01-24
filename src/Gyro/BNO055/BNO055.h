@@ -229,8 +229,7 @@ public:
     bool owned;
     USBSerial* bnoserial;
     char addr;
-    int writeData(char regaddr, char* data, uint8_t len);
-    int writeData(char regaddr, char * data, uint8_t len, bool repeat);
+    int writeData(char regaddr, char data, uint8_t len);
     void setPWR(PWRMode mode);
     char getOPMode();
     void setOPMode(char mode);

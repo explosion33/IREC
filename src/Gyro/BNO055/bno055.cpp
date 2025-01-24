@@ -32,16 +32,11 @@ int BNO055::readData(char regaddr, char* data, uint8_t len) {
     return i2c->read(addr, data, len);
 }
 
-int BNO055::writeData(char regaddr, char* data, uint8_t len) {
+int BNO055::writeData(char regaddr, char data, uint8_t len) {
     char buffer[2];
     buffer[0] = regaddr;
-    buffer[1] = *data;
-    return i2c->write(addr, data, len);
-
-}
-
-int BNO055::writeData(char regaddr, char * data, uint8_t len, bool repeat) {
-    return i2c->write(addr, data, len, repeat);
+    buffer[1] = data;
+    return i2c->write(addr, data, 2);
 }
 
 void BNO055::setPWR(PWRMode mode) {
@@ -51,7 +46,7 @@ void BNO055::setPWR(PWRMode mode) {
         case PWRMode::LowPower: modeData = 0x01; break;
         case PWRMode::Suspend:  modeData = 0x02; break;
     }
-    writeData(BNO055_PWR_MODE, &modeData, 1);
+    writeData(BNO055_PWR_MODE, modeData, 1);
 }
 
 char BNO055::getOPMode() {
@@ -63,7 +58,7 @@ char BNO055::getOPMode() {
 
 void BNO055::setOPMode(char mode) {
     setPage(0);
-    writeData(BNO055_OPR_MODE, &mode, 1);
+    writeData(BNO055_OPR_MODE, mode, 1);
     if (mode == BNO055_OPERATION_MODE_CONFIG) {
         wait(19);
     } else {
@@ -74,7 +69,7 @@ void BNO055::setOPMode(char mode) {
 void BNO055::setACC(char GRange, char Bandwidth, char OPMode) {
     setPage(0);
     char config = GRange | Bandwidth | OPMode;
-    writeData(BNO055_ACC_CONFIG, &config, 1);
+    writeData(BNO055_ACC_CONFIG, config, 1);
     wait(20);
 }
 
@@ -82,22 +77,22 @@ void BNO055::setGYR(char Range, char Bandwidth, char OPMode) {
     setPage(0);
     char config0 = Range | Bandwidth;
     char config1 = OPMode;
-    writeData(BNO055_GYRO_CONFIG_0, &config0, 1);
+    writeData(BNO055_GYRO_CONFIG_0, config0, 1);
     wait(20);
-    writeData(BNO055_GYRO_CONFIG_1, &config1, 1);
+    writeData(BNO055_GYRO_CONFIG_1, config1, 1);
     wait(20);
 }
 
 void BNO055::setMAG(char Rate, char OPMode, char Power) {
     setPage(0);
     char config = Rate | OPMode | Power;
-    writeData(BNO055_MAG_CONFIG, &config, 1);
+    writeData(BNO055_MAG_CONFIG, config, 1);
     wait(20);
 }
 
 void BNO055::setPage(uint8_t page) {
     char pageChar = static_cast<char>(page);
-    writeData(BNO055_PAGE_ID, &pageChar, 1);
+    writeData(BNO055_PAGE_ID, pageChar, 1);
 }
 
 void BNO055::setCLK(bool external) {
@@ -105,7 +100,7 @@ void BNO055::setCLK(bool external) {
     char tmp = 0x00;
     readData(BNO055_SYS_TRIGGER, &tmp, 1);
     tmp |= external ? 0x80 : 0x00;
-    writeData(BNO055_SYS_TRIGGER, &tmp, 1);
+    writeData(BNO055_SYS_TRIGGER, tmp, 1);
     wait(700);
 }
 
@@ -117,13 +112,13 @@ void BNO055::setUnit(bool acc, bool angular, bool euler, bool temp, bool fusion)
     config |= (euler << 2);
     config |= (temp << 4);
     config |= (fusion << 7);
-    writeData(BNO055_UNIT_SEL, &config, 1);
+    writeData(BNO055_UNIT_SEL, config, 1);
     wait(20);
 }
 
 void BNO055::reset() {
     char resetVal = 0x20;
-    writeData(BNO055_SYS_TRIGGER, &resetVal, 1);
+    writeData(BNO055_SYS_TRIGGER, resetVal, 1);
     wait(700);
 }
 
@@ -136,7 +131,7 @@ void BNO055::nReset() {
 
 void BNO055::setAxes(Axes newX, Axes newY, Axes newZ, bool xNeg, bool yNeg, bool zNeg) {
     char axes = getAxes(newX, newY, newZ);
-    writeData(BNO055_AXIS_MAP_CONFIG, &axes, 1);
+    writeData(BNO055_AXIS_MAP_CONFIG, axes, 1);
     wait(20);
 }
 
