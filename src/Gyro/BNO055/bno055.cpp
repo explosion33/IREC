@@ -5,18 +5,17 @@
 
 DigitalOut rst(PA_5);
 
-BNO055::BNO055(PinName SDA, PinName SCL, char addr) { // works, delete serial
+BNO055::BNO055(PinName SDA, PinName SCL, char addr) {
     owned = true;
     BNO055::i2c = new I2C(SDA, SCL);
     BNO055::addr = addr;
 }
 
-BNO055::BNO055(I2C* i2c) { // works
-    owned = false;
+BNO055::BNO055(I2C* i2c) {
     BNO055::i2c = i2c;
 }
 
-BNO055::~BNO055() { // good
+BNO055::~BNO055() {
     if (owned) {
         delete i2c;
     }
@@ -26,12 +25,12 @@ void BNO055::dummy(){
 
 }
 
-int BNO055::readData(char regaddr, char* data, uint8_t len) { //works
+int BNO055::readData(char regaddr, char* data, uint8_t len) {
     i2c->write(addr, &regaddr, 1);
     return i2c->read(addr, data, len);
 }
 
-int BNO055::writeData(char regaddr, char data, uint8_t len) { //works
+int BNO055::writeData(char regaddr, char data, uint8_t len) {
     char buffer[2];
     buffer[0] = regaddr;
     buffer[1] = data;
@@ -84,14 +83,14 @@ void BNO055::setPWR(PWRMode mode) { //test
     writeData(BNO055_PWR_MODE, modeData, 1);
 }
 
-char BNO055::getOPMode() { // works
+char BNO055::getOPMode() {  
     setPage(0);
     char mode = 0;
     readData(BNO055_OPR_MODE, &mode, 1);
     return mode;
 }
 
-void BNO055::setOPMode(char mode) { // works
+void BNO055::setOPMode(char mode) {
     setPage(0);
     writeData(BNO055_OPR_MODE, mode, 1);
     if (mode == BNO055_OPERATION_MODE_CONFIG) {

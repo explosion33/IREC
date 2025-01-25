@@ -209,9 +209,9 @@ struct bno055_vector_t {
 };
 
 struct offset {
-    double offsetX,
-    double offsetY,
-    double offsetZ,
+    uint16_t offsetX;
+    uint16_t offsetY;
+    uint16_t offsetZ;
 };
 
 class BNO055 {
@@ -284,6 +284,7 @@ public:
 private:
     I2C* i2c;
     bool owned;
+    char addr;
 
     // Configuration
     void setACC(char GRange, char Bandwidth, char OPMode);

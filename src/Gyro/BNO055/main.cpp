@@ -20,7 +20,7 @@ void scanI2C() {
 }
 int main()
 {   
-    BNO055 bno (PB_7, PB_6, &serial, 0x50);
+    BNO055 bno (PB_7, PB_6, 0x50);
     bno.setOPMode(BNO055_OPERATION_MODE_NDOF);
     while (true) {
 
