@@ -20,23 +20,14 @@ void scanI2C() {
 }
 int main()
 {   
-    // USBSerial serial;
     BNO055 bno (PB_7, PB_6, &serial, 0x50);
-        char data;
-        char addr = 0x3D;
-        char buffer[2];
-        buffer[0] = 0x3D;
-        buffer[1] = 0x0C;
-        int i = i2c.write(0x50, buffer, 2);
-        serial.printf("%d ", i);
-        bno.readData(addr, &data, 1);
-        serial.printf("%x\n", data);
-        addr = 0x08;
-        i2c.write(0x50, &addr, 1);
-        char gyr;
+    bno.setOPMode(BNO055_OPERATION_MODE_NDOF);
+    char unit;
+    char data[2];
     while (true) {
-        i2c.read(0x50, &gyr, 1);
-        serial.printf("%d\n", gyr);
-        ThisThread::sleep_for(200);
+        bno.readData(0x0C, data, 1);
+        uint16_t val = static_cast<int16_t>((data[1] << 8) | data[0]);
+        serial.printf("%d\n", val/100);
+        ThisThread::sleep_for(100);
     }
 }

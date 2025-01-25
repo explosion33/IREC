@@ -5,19 +5,19 @@
 
 DigitalOut rst(PA_5);
 
-BNO055::BNO055(PinName SDA, PinName SCL, USBSerial* serial, char addr) {
+BNO055::BNO055(PinName SDA, PinName SCL, USBSerial* serial, char addr) { // works, delete serial
     owned = true;
     BNO055::i2c = new I2C(SDA, SCL);
     BNO055::bnoserial = serial;
     BNO055::addr = addr;
 }
 
-BNO055::BNO055(I2C* i2c) {
+BNO055::BNO055(I2C* i2c) { // works
     owned = false;
-    this->i2c = i2c;
+    BNO055::i2c = i2c;
 }
 
-BNO055::~BNO055() {
+BNO055::~BNO055() { // good
     if (owned) {
         delete i2c;
     }
@@ -27,19 +27,19 @@ void BNO055::dummy(){
 
 }
 
-int BNO055::readData(char regaddr, char* data, uint8_t len) { 
+int BNO055::readData(char regaddr, char* data, uint8_t len) { //works
     i2c->write(addr, &regaddr, 1);
     return i2c->read(addr, data, len);
 }
 
-int BNO055::writeData(char regaddr, char data, uint8_t len) {
+int BNO055::writeData(char regaddr, char data, uint8_t len) { //works
     char buffer[2];
     buffer[0] = regaddr;
     buffer[1] = data;
-    return i2c->write(addr, data, 2);
+    return i2c->write(addr, buffer, 2);
 }
 
-void BNO055::setPWR(PWRMode mode) {
+void BNO055::setPWR(PWRMode mode) { //test
     char modeData = 0x00;
     switch(mode) {
         case PWRMode::Normal:   modeData = 0x00; break;
@@ -49,14 +49,14 @@ void BNO055::setPWR(PWRMode mode) {
     writeData(BNO055_PWR_MODE, modeData, 1);
 }
 
-char BNO055::getOPMode() {
+char BNO055::getOPMode() { // works
     setPage(0);
     char mode = 0;
     readData(BNO055_OPR_MODE, &mode, 1);
     return mode;
 }
 
-void BNO055::setOPMode(char mode) {
+void BNO055::setOPMode(char mode) { // works
     setPage(0);
     writeData(BNO055_OPR_MODE, mode, 1);
     if (mode == BNO055_OPERATION_MODE_CONFIG) {
@@ -230,7 +230,7 @@ void BNO055::runSelfTest() {
     char set;
     readData(BNO055_SYS_TRIGGER, &set, 1);
     set |= 0x01;
-    writeData(BNO055_SYS_TRIGGER, &set, 1);
+    writeData(BNO055_SYS_TRIGGER, set, 1);
     wait(20);
 }
 
@@ -255,7 +255,7 @@ BNO055Result BNO055::readSelfTest() {
     }
 }
 
-bno055_vector_t BNO055::bno055_getVector(uint8_t vec) { // doesn't work because of how our read data function works
+bno055_vector_t BNO055::bno055_getVector(char vec) {
     setPage(0);
     char buffer[8] = {0};
     if (vec == BNO055_VECTOR_QUATERNION) {
@@ -263,7 +263,6 @@ bno055_vector_t BNO055::bno055_getVector(uint8_t vec) { // doesn't work because 
     } else {
         readData(vec, buffer, 6);
     }
-    bnoserial->printf("%d", buffer[0]);
     double scale = 1.0;
     if (vec == BNO055_VECTOR_MAGNETOMETER) {
         scale = magScale;

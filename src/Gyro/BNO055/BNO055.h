@@ -253,5 +253,5 @@ public:
     BNO055Result checkCalibration();
     void runSelfTest();
     BNO055Result readSelfTest();
-    bno055_vector_t bno055_getVector(std::uint8_t vec);
+    bno055_vector_t bno055_getVector(char vec);
 };
