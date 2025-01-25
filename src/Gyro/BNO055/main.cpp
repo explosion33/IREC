@@ -25,9 +25,14 @@ int main()
     char unit;
     char data[2];
     while (true) {
-        bno.readData(0x0C, data, 1);
-        uint16_t val = static_cast<int16_t>((data[1] << 8) | data[0]);
-        serial.printf("%d\n", val/100);
+        bno.readData(0x1E, data, 1);
+        uint16_t val = ((data[1] << 8) | data[0]);
+        float pr = val/100;
+        serial.printf("%f\n", pr);
         ThisThread::sleep_for(100);
+        // bno.readData(BNO055_CALIB_STAT, &unit, 1);
+        // serial.printf("%2x\n", unit);
+        //serial.printf("%d\n", bno.getAccCalib());
+
     }
 }
