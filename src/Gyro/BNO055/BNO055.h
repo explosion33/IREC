@@ -237,7 +237,7 @@ public:
     void setGYR(char Range, char Bandwidth, char OPMode);
     void setMAG(char Rate, char OPMode, char Power);
     void setPage(uint8_t page);
-    int getSysCalib();
+    int getSysCalib();  
     int getAccCalib();
     int getGyrCalib();
     int getMagCalib();
