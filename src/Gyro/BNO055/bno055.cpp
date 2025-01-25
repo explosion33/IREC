@@ -5,10 +5,9 @@
 
 DigitalOut rst(PA_5);
 
-BNO055::BNO055(PinName SDA, PinName SCL, USBSerial* serial, char addr) { // works, delete serial
+BNO055::BNO055(PinName SDA, PinName SCL, char addr) { // works, delete serial
     owned = true;
     BNO055::i2c = new I2C(SDA, SCL);
-    BNO055::bnoserial = serial;
     BNO055::addr = addr;
 }
 
@@ -102,7 +101,7 @@ void BNO055::setOPMode(char mode) { // works
     }
 }
 
-void BNO055::setACC(char GRange, char Bandwidth, char OPMode) {
+void BNO055::setACC(char GRange, char Bandwidth, char OPMode) { //todo: test all configuration stuff
     setPage(0);
     char config = GRange | Bandwidth | OPMode;
     writeData(BNO055_ACC_CONFIG, config, 1);
@@ -126,7 +125,7 @@ void BNO055::setMAG(char Rate, char OPMode, char Power) {
     wait(20);
 }
 
-void BNO055::setPage(uint8_t page) {
+void BNO055::setPage(uint8_t page) { // test
     char pageChar = static_cast<char>(page);
     writeData(BNO055_PAGE_ID, pageChar, 1);
 }
@@ -192,58 +191,178 @@ char BNO055::getAxesSign(bool xNeg, bool yNeg, bool zNeg) {
     return sign;
 }
 
-void BNO055::setACCOffset() {
-    // todo
+void BNO055::setACCOffset(uint16_t offsetX, uint16_t offsetY, uint16_t offsetZ) {
+    char lsbX  = (char)(offsetX & 0xFF); 
+    char msbX = (char)((offsetX >> 8) & 0xFF);
+    writeData(BNO055_ACC_OFFSET_X_LSB, lsbX, 1);
+    writeData(BNO055_ACC_OFFSET_X_MSB, msbX, 1);
+
+    char lsbY  = (char)(offsetY & 0xFF); 
+    char msbY = (char)((offsetY >> 8) & 0xFF);
+    writeData(BNO055_ACC_OFFSET_Y_LSB, lsbY, 1);
+    writeData(BNO055_ACC_OFFSET_Y_MSB, msbY, 1);
+
+    char lsbZ  = (char)(offsetZ & 0xFF); 
+    char msbZ = (char)((offsetZ >> 8) & 0xFF);
+    writeData(BNO055_ACC_OFFSET_Z_LSB, lsbZ, 1);
+    writeData(BNO055_ACC_OFFSET_Z_MSB, msbZ, 1);
 }
 
-void BNO055::setMAGOffset() {
-    // todo
+void BNO055::setMAGOffset(uint16_t offsetX, uint16_t offsetY, uint16_t offsetZ) {
+    char lsbX  = (char)(offsetX & 0xFF); 
+    char msbX = (char)((offsetX >> 8) & 0xFF);
+    writeData(BNO055_MAG_OFFSET_X_LSB, lsbX, 1);
+    writeData(BNO055_MAG_OFFSET_X_MSB, msbX, 1);
+
+    char lsbY  = (char)(offsetY & 0xFF); 
+    char msbY = (char)((offsetY >> 8) & 0xFF);
+    writeData(BNO055_MAG_OFFSET_Y_LSB, lsbY, 1);
+    writeData(BNO055_MAG_OFFSET_Y_MSB, msbY, 1);
+
+    char lsbZ  = (char)(offsetZ & 0xFF); 
+    char msbZ = (char)((offsetZ >> 8) & 0xFF);
+    writeData(BNO055_MAG_OFFSET_Z_LSB, lsbZ, 1);
+    writeData(BNO055_MAG_OFFSET_Z_MSB, msbZ, 1); 
 }
 
-void BNO055::setGYRPOffset() {
-    // todo
+void BNO055::setGYROffset(uint16_t offsetX, uint16_t offsetY, uint16_t offsetZ) {
+    char lsbX  = (char)(offsetX & 0xFF); 
+    char msbX = (char)((offsetX >> 8) & 0xFF);
+    writeData(BNO055_GYR_OFFSET_X_LSB, lsbX, 1);
+    writeData(BNO055_GYR_OFFSET_X_MSB, msbX, 1);
+
+    char lsbY  = (char)(offsetY & 0xFF); 
+    char msbY = (char)((offsetY >> 8) & 0xFF);
+    writeData(BNO055_GYR_OFFSET_Y_LSB, lsbY, 1);
+    writeData(BNO055_GYR_OFFSET_Y_MSB, msbY, 1);
+
+    char lsbZ  = (char)(offsetZ & 0xFF); 
+    char msbZ = (char)((offsetZ >> 8) & 0xFF);
+    writeData(BNO055_GYR_OFFSET_Z_LSB, lsbZ, 1);
+    writeData(BNO055_GYR_OFFSET_Z_MSB, msbZ, 1);
 }
 
-void BNO055::setRadius() {
-    // todo
+void BNO055::setRadius(uint16_t accRadius, uint16_t magRadius) {
+    char lsbAcc  = (char)(accRadius & 0xFF); 
+    char msbAcc = (char)((accRadius >> 8) & 0xFF);
+    writeData(BNO055_ACC_RADIUS_LSB, lsbAcc, 1);
+    writeData(BNO055_ACC_RADIUS_MSB, msbAcc, 1);
+
+    char lsbMag  = (char)(magRadius & 0xFF); 
+    char msbMag = (char)((magRadius >> 8) & 0xFF);
+    writeData(BNO055_MAG_RADIUS_LSB, lsbMag, 1);
+    writeData(BNO055_MAG_RADIUS_MSB, msbMag, 1);
 }
 
-void BNO055::get_SysErr() {
+uint16_t BNO055::getAccRadius(){
+    char lsb, msb;
+
+    readData(BNO055_ACC_RADIUS_LSB, &lsb, 1);
+    readData(BNO055_ACC_RADIUS_MSB, &msb, 1);
+    
+    uint16_t radius = static_cast<uint16_t>((msb << 8) | lsb);
+    return radius;
+}
+
+uint16_t BNO055::getMagRadius(){
+    char lsb, msb;
+
+    readData(BNO055_MAG_RADIUS_LSB, &lsb, 1);
+    readData(BNO055_MAG_RADIUS_MSB, &msb, 1);
+    
+    uint16_t radius = static_cast<uint16_t>((msb << 8) | lsb);
+    return radius;  
+}
+
+offset BNO055::getMagOffset(){
+    char lsbX, msbX;
+
+    readData(BNO055_MAG_OFFSET_X_LSB, &lsbX, 1);
+    readData(BNO055_MAG_OFFSET_X_MSB, &msbX, 1);
+    
+    uint16_t offsetX = static_cast<uint16_t>((msbX << 8) | lsbX);
+
+    char lsbY, msbY;
+
+    readData(BNO055_MAG_OFFSET_Y_LSB, &lsbY, 1);
+    readData(BNO055_MAG_OFFSET_Y_MSB, &msbY, 1);
+    
+    uint16_t offsetY = static_cast<uint16_t>((msbY << 8) | lsbY);
+
+    char lsbZ, msbZ;
+
+    readData(BNO055_MAG_OFFSET_Z_LSB, &lsbZ, 1);
+    readData(BNO055_MAG_OFFSET_Z_MSB, &msbZ, 1);
+    
+    uint16_t offsetZ = static_cast<uint16_t>((msbZ << 8) | lsbZ);
+    
+    return offset{offsetX, offsetY, offsetZ};
+}
+
+offset BNO055::getAccOffset(){
+    char lsbX, msbX;
+
+    readData(BNO055_ACC_OFFSET_X_LSB, &lsbX, 1);
+    readData(BNO055_ACC_OFFSET_X_MSB, &msbX, 1);
+    
+    uint16_t offsetX = static_cast<uint16_t>((msbX << 8) | lsbX);
+
+    char lsbY, msbY;
+
+    readData(BNO055_ACC_OFFSET_Y_LSB, &lsbY, 1);
+    readData(BNO055_ACC_OFFSET_Y_MSB, &msbY, 1);
+    
+    uint16_t offsetY = static_cast<uint16_t>((msbY << 8) | lsbY);
+
+    char lsbZ, msbZ;
+
+    readData(BNO055_ACC_OFFSET_Z_LSB, &lsbZ, 1);
+    readData(BNO055_ACC_OFFSET_Z_MSB, &msbZ, 1);
+    
+    uint16_t offsetZ = static_cast<uint16_t>((msbZ << 8) | lsbZ);
+    
+    return offset{offsetX, offsetY, offsetZ};
+}
+
+
+offset BNO055::getGyrOffset(){
+    char lsbX, msbX;
+
+    readData(BNO055_GYR_OFFSET_X_LSB, &lsbX, 1);
+    readData(BNO055_GYR_OFFSET_X_MSB, &msbX, 1);
+    
+    uint16_t offsetX = static_cast<uint16_t>((msbX << 8) | lsbX);
+
+    char lsbY, msbY;
+
+    readData(BNO055_GYR_OFFSET_Y_LSB, &lsbY, 1);
+    readData(BNO055_GYR_OFFSET_Y_MSB, &msbY, 1);
+    
+    uint16_t offsetY = static_cast<uint16_t>((msbY << 8) | lsbY);
+
+    char lsbZ, msbZ;
+
+    readData(BNO055_GYR_OFFSET_Z_LSB, &lsbZ, 1);
+    readData(BNO055_GYR_OFFSET_Z_MSB, &msbZ, 1);
+    
+    uint16_t offsetZ = static_cast<uint16_t>((msbZ << 8) | lsbZ);
+    
+    return offset{offsetX, offsetY, offsetZ};
+}
+
+
+char BNO055::get_SysErr() {
     setPage(0);
     char err = 0x00;
     readData(BNO055_SYS_ERR, &err, 1);
-    switch (err) {
-        case 0x00: printf("No error"); break;
-        case 0x01: printf("Peripheral initialization error"); break;
-        case 0x02: printf("System initialization error"); break;
-        case 0x03: printf("Self test result failed"); break;
-        case 0x04: printf("Register map value out of range"); break;
-        case 0x05: printf("Register map address out of range"); break;
-        case 0x06: printf("Register map write error"); break;
-        case 0x07: printf("BNO low power mode not available for selected operation mode"); break;
-        case 0x08: printf("Accelerometer power mode not available"); break;
-        case 0x09: printf("Fusion algorithm configuration error"); break;
-        case 0x0A: printf("Sensor configuration error"); break;
-        default:   printf("Unknown error code: 0x%02X", (unsigned char)err); break;
-    }
-    printf("\n");
+    return err;
 }
 
-void BNO055::get_SysStatus() {
+char BNO055::get_SysStatus() {
     setPage(0);
     char status = 0x00;
     readData(BNO055_SYS_STATUS, &status, 1);
-    switch (status) {
-        case 0x00: printf("System idle"); break;
-        case 0x01: printf("System Error"); break;
-        case 0x02: printf("Initializing peripherals"); break;
-        case 0x03: printf("System Initialization"); break;
-        case 0x04: printf("Executing self test"); break;
-        case 0x05: printf("Sensor fusion algorithm running"); break;
-        case 0x06: printf("System running without fusion algorithm"); break;
-        default:   printf("Unknown system status: 0x%02X", (unsigned char)status); break;
-    }
-    printf("\n");
+    return status;
 }
 
 void BNO055::runSelfTest() {
@@ -274,6 +393,21 @@ BNO055Result BNO055::readSelfTest() {
         return BNO055Result::Ok;
     }
 }
+
+BNO055Result BNO055::setup() {
+    reset();
+    setPage(0);
+
+    // todo: add additional settings
+
+    return BNO055Result::Ok;
+}
+
+BNO055Result BNO055::stop() {
+    setPWR(PWRMode::Suspend);
+    return BNO055Result::Ok;
+}
+
 
 bno055_vector_t BNO055::bno055_getVector(char vec) {
     setPage(0);
@@ -312,56 +446,31 @@ bno055_vector_t BNO055::bno055_getVector(char vec) {
     return xyz;
 }
 
-BNO055Result BNO055::setup() {
-    reset();
-    char id;
-    readData(BNO055_CHIP_ID, &id, 1);
-    bnoserial->printf("%d", id);
-    if (id != BNO055_ID) {
-        bnoserial->printf("Can't find BNO055");
-        return BNO055Result::SysErr;
-    }
-    BNO055Result res = readSelfTest();
-    if (res != BNO055Result::Ok) {
-        bnoserial->printf("POST Error");
-        return res;
-    }
-    setPage(0);
 
-    // todo: add additional settings
-
-    return BNO055Result::Ok;
-}
-
-BNO055Result BNO055::stop() {
-    setPWR(PWRMode::Suspend);
-    return BNO055Result::Ok;
-}
-
-bno055_vector_t BNO055::bno055_getVectorAccelerometer() {
+bno055_vector_t BNO055::getAccelerometer() {
     return bno055_getVector(BNO055_VECTOR_ACCELEROMETER);
 }
 
-bno055_vector_t BNO055::bno055_getVectorMagnetometer() {
+bno055_vector_t BNO055::getMagnetometer() {
     return bno055_getVector(BNO055_VECTOR_MAGNETOMETER);
 }
 
-bno055_vector_t BNO055::bno055_getVectorGyroscope() {
+bno055_vector_t BNO055::getGyroscope() {
     return bno055_getVector(BNO055_VECTOR_GYROSCOPE);
 }
 
-bno055_vector_t BNO055::bno055_getVectorEuler() {
+bno055_vector_t BNO055::getEuler() {
     return bno055_getVector(BNO055_VECTOR_EULER);
 }
 
-bno055_vector_t BNO055::bno055_getVectorLinearAccel() {
+bno055_vector_t BNO055::getLinearAccel() {
     return bno055_getVector(BNO055_VECTOR_LINEARACCEL);
 }
 
-bno055_vector_t BNO055::bno055_getVectorGravity() {
+bno055_vector_t BNO055::getGravity() {
     return bno055_getVector(BNO055_VECTOR_GRAVITY);
 }
 
-bno055_vector_t BNO055::bno055_getVectorQuaternion() {
+bno055_vector_t BNO055::getQuaternion() {
     return bno055_getVector(BNO055_VECTOR_QUATERNION);
 }
