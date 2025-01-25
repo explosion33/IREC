@@ -39,6 +39,42 @@ int BNO055::writeData(char regaddr, char data, uint8_t len) { //works
     return i2c->write(addr, buffer, 2);
 }
 
+int BNO055::getSysCalib(){ //returns 0 if functional
+    char stat;
+    readData(BNO055_CALIB_STAT, &stat, 1);
+    if (((stat >> 6) & 0x03) != 3){
+        return 1;
+    }
+    return 0;
+}
+
+int BNO055::getGyrCalib(){
+    char stat;
+    readData(BNO055_CALIB_STAT, &stat, 1);
+    if (((stat >> 4) & 0x03) != 3){
+        return 1;
+    }
+    return 0;
+}
+
+int BNO055::getAccCalib(){
+    char stat;
+    readData(BNO055_CALIB_STAT, &stat, 1);
+    if (((stat >> 2) & 0x03) != 3){
+        return 1;
+    }
+    return 0;
+}
+
+int BNO055::getMagCalib(){
+    char stat;
+    readData(BNO055_CALIB_STAT, &stat, 1);
+    if (((stat) & 0x03) != 3){
+        return 1;
+    }
+    return 0;
+}
+
 void BNO055::setPWR(PWRMode mode) { //test
     char modeData = 0x00;
     switch(mode) {
@@ -208,22 +244,6 @@ void BNO055::get_SysStatus() {
         default:   printf("Unknown system status: 0x%02X", (unsigned char)status); break;
     }
     printf("\n");
-}
-
-BNO055Result BNO055::checkCalibration() {
-    char calib_state = 0;
-    readData(BNO055_CALIB_STAT, &calib_state, 1);
-    if ((calib_state >> 6 & 0x03) != 0x03) {
-        return BNO055Result::SysErr;
-    } else if ((calib_state >> 4 & 0x03) != 0x03) {
-        return BNO055Result::GyrErr;
-    } else if ((calib_state >> 2 & 0x03) != 0x03) {
-        return BNO055Result::AccErr;
-    } else if ((calib_state & 0x03) != 0x03) {
-        return BNO055Result::MagErr;
-    } else {
-        return BNO055Result::Ok;
-    }
 }
 
 void BNO055::runSelfTest() {

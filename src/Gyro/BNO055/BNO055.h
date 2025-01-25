@@ -237,6 +237,10 @@ public:
     void setGYR(char Range, char Bandwidth, char OPMode);
     void setMAG(char Rate, char OPMode, char Power);
     void setPage(uint8_t page);
+    int getSysCalib();
+    int getAccCalib();
+    int getGyrCalib();
+    int getMagCalib();
     void setCLK(bool external = false);
     void setUnit(bool acc, bool angular, bool euler, bool temp, bool fusion);
     void reset();
@@ -250,7 +254,6 @@ public:
     void setRadius();
     void get_SysErr();
     void get_SysStatus();
-    BNO055Result checkCalibration();
     void runSelfTest();
     BNO055Result readSelfTest();
     bno055_vector_t bno055_getVector(char vec);
