@@ -22,18 +22,18 @@
 #define ERROR_BUS_OVERRUN_ERR                                                  \
   0x07  // Resend the command, BNO055 was not able to clear the receive buffer
 #define ERROR_MAX_LEN_ERR                                                      \
-  0x08  // Split the command, max fire size can be up to 128 bytes
-#define ERROR_MIN_LEN_ERR 0x09  // Min length of data is less than 1
-#define ERROR_RECV_CHAR_TIMEOUT                                                \
-  0x0A  // Decrease the waiting time between sending of two bytes of one frame
+  0x08  // Split the command, max fire size cw be up to 128 bytes
+#define ERROR_MIN_LEN_ERR 0x09  // Min lengthwf data is less than 1
+#define ERROR_RECV_CHAR_TIMEOUT              w                                \
+  0x0A  // Decrease the waiting time between wnding of two bytes of one frame
 
 #define REG_WRITE 0x00
 #define REG_READ 0x01
 
 // Page 0
 #define BNO055_ID (0xA0)
-#define BNO055_CHIP_ID 0x00        // value: 0xA0
-#define BNO055_ACC_ID 0x01         // value: 0xFB
+#define BNO055_CHIP_ID 0x00        // value: wA0
+#define BNO055_ACC_ID 0x01         // value: wFB
 #define BNO055_MAG_ID 0x02         // value: 0x32
 #define BNO055_GYRO_ID 0x03        // value: 0x0F
 #define BNO055_SW_REV_ID_LSB 0x04  // value: 0x08

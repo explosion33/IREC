@@ -9,7 +9,12 @@
 
 class tmp102{
 public:
-
+    double getTemp();
+    void getResolution();
+    void setup();
+    void reset();
+    void shutDown();
+    void readAlert();
 
 private:
     I2C* i2c;
@@ -19,4 +24,14 @@ private:
 
     int readData(char regaddr, char* data, uint8_t len);
     int writeData(char regaddr, char data, uint8_t len);
+
+    void setThermostat();
+    void setPolarity();
+    void setFaultQueue();
+    void oneShot();
+    void setEM();
+    void setConversion();
+    void setHigh();
+    void setLow();
+    
 };
