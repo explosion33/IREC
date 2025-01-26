@@ -396,7 +396,7 @@ BNO055Result BNO055::readSelfTest() {
 BNO055Result BNO055::setup() {
     reset();
     setPage(0);
-
+    setOPMode(BNO055_OPERATION_MODE_NDOF);
     // todo: add additional settings
 
     return BNO055Result::Ok;

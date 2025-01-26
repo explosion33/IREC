@@ -3,9 +3,7 @@
 // main() runs in its own thread in the OS
 #include "func.h"
 #include "USBSerial.h"
-DigitalOut test (PC_13);
-int bno_addr = 0x50;
-I2C i2c (PB_7, PB_6);
+DigitalOut test (PC_13); // Onboard LED
 USBSerial serial;
 int ack; 
 int address;  
@@ -20,9 +18,9 @@ void scanI2C() {
 }
 int main()
 {   
-    BNO055 bno (PB_7, PB_6, 0x50);
-    bno.setOPMode(BNO055_OPERATION_MODE_NDOF);
+    BNO055 bno (PB_7, PB_6, 0x28 << 1);
+    bno.setup();
     while (true) {
-
+        
     }
 }
