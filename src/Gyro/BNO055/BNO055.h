@@ -273,6 +273,7 @@ public:
     bno055_vector_t getLinearAccel();
     bno055_vector_t getGravity();
     bno055_vector_t getQuaternion();
+    float getTemperature();
 
     // Calibration 
     offset getGyrOffset();

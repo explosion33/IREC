@@ -10,10 +10,7 @@ public:
     float getAngleRad();
 
     void reset();
-
     void setup();
-
-
 
 private:
     InterruptIn pinA;

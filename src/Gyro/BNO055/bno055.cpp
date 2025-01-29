@@ -446,6 +446,12 @@ bno055_vector_t BNO055::bno055_getVector(char vec) {
 }
 
 
+float BNO055::getTemperature(){
+    char temp;
+    readData(BNO055_TEMP, &temp, 1);
+    return temp;
+}
+
 bno055_vector_t BNO055::getAccelerometer() {
     return bno055_getVector(BNO055_VECTOR_ACCELEROMETER);
 }

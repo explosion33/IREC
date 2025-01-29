@@ -5,6 +5,7 @@
 #include "USBSerial.h"
 DigitalOut test (PC_13); // Onboard LED
 USBSerial serial;
+I2C i2c(PB_7, PB_6);
 int ack; 
 int address;  
 void scanI2C() {
@@ -13,14 +14,19 @@ void scanI2C() {
     if (ack == 0) {
        serial.printf("\tFound at %3d -- %3x\r\n", address,address);
     }    
-    wait(0.05);
+    wait(50);
   } 
 }
+
 int main()
 {   
     BNO055 bno (PB_7, PB_6, 0x28 << 1);
     bno.setup();
+    bno055_vector_t vec;
     while (true) {
-        
+        // scanI2C();
+        vec = bno.getGravity();
+        serial.printf("%f, %f, %f \n", vec.x, vec.y, vec.z);
+        wait(100);
     }
 }
