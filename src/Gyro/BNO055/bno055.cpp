@@ -1,5 +1,6 @@
 #include "mbed.h"
 #include "BNO055.h"
+#include "bno055_cont.h"
 #include <map>
 #include "func.h"
 
