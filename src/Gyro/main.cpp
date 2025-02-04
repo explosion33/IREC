@@ -20,13 +20,15 @@ void scanI2C() {
 
 int main()
 {   
-    BNO055 bno (PB_7, PB_6, 0x28 << 1);
-    bno.setup();
-    bno055_vector_t vec;
+    // BNO055 bno (PB_7, PB_6, 0x28 << 1);
+    // bno.setup();
+    // bno055_vector_t vec;
     while (true) {
-        // scanI2C();
-        vec = bno.getGravity();
-        serial.printf("%f, %f, %f \n", vec.x, vec.y, vec.z);
+        serial.printf("Scanning\n");
+        scanI2C();
         wait(100);
+        // vec = bno.getGravity();
+        // serial.printf("%f, %f, %f \n", vec.x, vec.y, vec.z);
+        // wait(100);
     }
 }
