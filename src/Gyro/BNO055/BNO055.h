@@ -5,7 +5,6 @@
 #include <cstdint> // For std::uint16_t
 #include "mbed.h"
 #include "USBSerial.h"
-#include "bno055_cont.h"
 
 enum class BNO055Result {
     Ok,
