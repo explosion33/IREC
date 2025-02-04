@@ -1,4 +1,10 @@
-    #include <cstdint> // For std::uint16_t
+/* 
+* BNO055 Constants
+* Contains macros for all register addresses
+*/
+
+
+#include <cstdint> // For std::uint16_t
 
 #define START_BYTE 0xAA
 #define RESPONSE_BYTE 0xBB
@@ -162,6 +168,8 @@
 #define BNO055_OPERATION_MODE_NDOF_FMC_OFF  0x0B
 #define BNO055_OPERATION_MODE_NDOF       0x0C
 
+
+// Data read scale
 static constexpr std::uint16_t accelScale       = 100;
 static constexpr std::uint16_t tempScale        = 1;
 static constexpr std::uint16_t angularRateScale = 16;

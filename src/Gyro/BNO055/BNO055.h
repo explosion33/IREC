@@ -1,3 +1,7 @@
+/*
+* Contains definitions of the BNO055 class and related enums and structs
+*/
+
 #include <cstdint> // For std::uint16_t
 #include "mbed.h"
 #include "USBSerial.h"

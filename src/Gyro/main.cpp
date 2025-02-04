@@ -4,6 +4,7 @@
 #include "func.h"
 #include "USBSerial.h"
 DigitalOut test (PC_13); // Onboard LED
+DigitalOut rst(PA_5); // RST pin for the BNO055
 USBSerial serial;
 I2C i2c(PB_7, PB_6);
 int ack; 
