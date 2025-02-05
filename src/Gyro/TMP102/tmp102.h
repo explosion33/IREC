@@ -21,6 +21,7 @@ private:
     I2C* i2c;
     char addr;
     int extendedMode;
+    int polarity;
 
     tmp102(PinName SDA, PinName SCL, char addr);
 
