@@ -266,9 +266,9 @@ void BNO055::reset() {
  *        Define a global rst pin in main. 
  */
 void BNO055::nReset() {
-    rst = 0;
+    //rst = 0;
     wait(500);
-    rst = 1;
+    //rst = 1;
     wait(500);
 }
 
