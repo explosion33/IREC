@@ -49,3 +49,4 @@ Servo& Servo::operator= (Servo& rhs) {
 Servo::operator float() {
     return read();
 }
+
