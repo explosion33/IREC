@@ -46,7 +46,7 @@ void tmp102::turnOn(){
 }
 
 void tmp102::setComparator(){
-    cchar config[2];
+    char config[2];
     readData(TMP102_CONFIG, config, 2);
     config[0] = config[0] & 0xFD;
     writeData(TMP102_CONFIG, config, 2);
@@ -132,7 +132,7 @@ void tmp102::setLow(uint16_t low){
     char val[2];
     val[0] = static_cast<char>(low & 0xFF);
     val[1] = static_cast<char>((low >> 8) & 0xFF);
-    writeData(TMP102_low, val, 2);
+    writeData(TMP102_TLOW, val, 2);
 }
 
 
