@@ -6,6 +6,21 @@ tmp102::tmp102(PinName SDA, PinName SCL, char addr){
     tmp102::addr = addr;
     extendedMode = 0;
     polarity = 0;
+    owned = true;
+}
+
+tmp102::tmp102(I2C* i2c, char addr){
+    tmp102::i2c = i2c;
+    tmp102::addr = addr;
+    extendedMode = 0;
+    polarity = 0;
+    owned = false;
+}
+
+tmp102::~tmp102(){
+    if (owned){ 
+        delete i2c;
+    }
 }
 
 int tmp102::readData(char regaddr, char* data, uint8_t len) {
@@ -137,7 +152,7 @@ void tmp102::setLow(uint16_t low){
 
 
 void tmp102::setup(){
-
+    
 }
 
 void tmp102::reset(){

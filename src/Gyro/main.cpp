@@ -56,16 +56,10 @@ void motorTest() {
 //         wait(100);
 //     }
 // }
+tmp102 tmp(PB_7, PB_6, 0x91);
 int main()
 {   
-    tmp102 tmp(PB_7, PB_6, 0x91);
-    char temp[2];
-    uint16_t a = 0;
     while(1) {
-        a = tmp.getTemp();
-        float b = 0.0625 * a;
-        serial.printf("%f\n", b);
-        wait(100);
     }
     
 

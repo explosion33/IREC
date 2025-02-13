@@ -18,11 +18,14 @@ public:
     int readAlert();
 
     tmp102(PinName SDA, PinName SCL, char addr);
-//private:
+    tmp102(I2C* i2c);
+    ~tmp102();
+private:
     I2C* i2c;
     char addr;
     int extendedMode;
     int polarity;
+    bool owned;
 
     int readData(char regaddr, char* data, uint8_t len);
     int writeData(char regaddr, char data[2], uint8_t len);

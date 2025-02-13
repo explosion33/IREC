@@ -20,8 +20,9 @@ BNO055::BNO055(PinName SDA, PinName SCL, char addr) {
  * @brief Constructor that uses an external I2C object (not owned by this class).
  * @param i2c Pointer to an already-initialized I2C object
  */
-BNO055::BNO055(I2C* i2c) {
+BNO055::BNO055(I2C* i2c, char addr) {
     BNO055::i2c = i2c;
+    BNO055::addr = addr;;
 }
 
 /**
