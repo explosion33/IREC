@@ -7,7 +7,7 @@
 #ifndef FLASH_RESET
 #define FLASH_RESET         0x99
 #endif
-
+// todo: redefine all constants
 flash::flash(PinName mosi, PinName miso, PinName sclk, PinName csPin)
     : _spi(mosi, miso, sclk), _cs(csPin, 1) {
     _spi.format(8, 0);
