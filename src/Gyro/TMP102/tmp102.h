@@ -18,7 +18,7 @@ public:
     int readAlert();
 
     tmp102(PinName SDA, PinName SCL, char addr);
-    tmp102(I2C* i2c);
+    tmp102(I2C* i2c, char addr);
     ~tmp102();
 private:
     I2C* i2c;

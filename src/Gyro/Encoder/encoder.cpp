@@ -1,9 +1,7 @@
 #include "mbed.h"
 #include "encoder.h"
 
-encoder::encoder(PinName A, PinName B){
-    pinA = A;
-    pinB = B;
+encoder::encoder(PinName A, PinName B) : pinA(A), pinB(B) {     
     position = 0;
     lastState = 0;
     direction = 0;
@@ -14,10 +12,10 @@ void encoder::setup(){
     pinB.mode(PullUp);
     lastState = (static_cast<uint8_t>(pinA.read()) << 1) | pinB.read();
 
-    pinA.fall(callback(this, &encoder::interruptA()));
-    pinA.rise(callback(this, &encoder::interruptA()));
-    pinB.fall(callback(this, &encoder::interruptB()));
-    pinB.rise(callback(this, &encoder::interruptB()));
+    pinA.fall(callback(this, &encoder::interruptA));
+    pinA.rise(callback(this, &encoder::interruptA));
+    pinB.fall(callback(this, &encoder::interruptB));
+    pinB.rise(callback(this, &encoder::interruptB));
 }
 int16_t encoder::getPos(){
     __disable_irq();

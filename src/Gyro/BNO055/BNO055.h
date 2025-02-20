@@ -63,7 +63,7 @@ public:
      * Constructor using an existing I2C object.
      * @param i2c Pointer to an existing I2C interface
      */
-    BNO055(I2C* i2c);
+    BNO055(I2C* i2c, char addr);
 
     /**
      * Destructor.

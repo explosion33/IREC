@@ -4,7 +4,7 @@ class encoder {
 public:
     encoder(PinName A, PinName B);
 
-    int32_t getPos();
+    int16_t getPos();
     float getAngleDeg();
     int getDirection();
     float getAngleRad();
