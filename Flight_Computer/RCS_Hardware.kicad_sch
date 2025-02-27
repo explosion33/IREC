@@ -8256,10 +8256,6 @@
 		(uuid "fc41526d-87e0-4e0d-944a-a78c3e19d313")
 	)
 	(no_connect
-		(at 86.36 119.38)
-		(uuid "29ff1f1b-7617-446d-ab5e-7a11806ef171")
-	)
-	(no_connect
 		(at 206.502 70.612)
 		(uuid "3d72c456-6d59-4352-a071-2253ca4558e7")
 	)
@@ -8292,12 +8288,20 @@
 		(uuid "74cb91e8-1af9-4620-80b0-728e3e8763ca")
 	)
 	(no_connect
+		(at 86.36 124.46)
+		(uuid "7c8697a1-57bb-45ee-a2c3-e2f117e44992")
+	)
+	(no_connect
 		(at 242.062 68.072)
 		(uuid "810ae571-3bbe-403b-bd1d-b5fabe278e45")
 	)
 	(no_connect
 		(at 329.692 200.406)
 		(uuid "8ca30c29-7cc5-4521-844c-885e586a3f61")
+	)
+	(no_connect
+		(at 86.36 127)
+		(uuid "ae0b58a9-8778-44ba-9009-58d3f5d9339f")
 	)
 	(no_connect
 		(at 175.26 255.27)
@@ -8308,16 +8312,16 @@
 		(uuid "bc7638c3-30bf-49c5-a5a2-c61c70ec1b28")
 	)
 	(no_connect
-		(at 119.38 116.84)
-		(uuid "d48f8d00-7fd8-4667-a6b5-07861811ccfb")
-	)
-	(no_connect
 		(at 234.188 207.518)
 		(uuid "f1e7b886-6817-49d3-b8aa-8780b95356c8")
 	)
 	(no_connect
 		(at 234.188 210.058)
 		(uuid "f1e7b886-6817-49d3-b8aa-8780b95356c9")
+	)
+	(no_connect
+		(at 86.36 129.54)
+		(uuid "f58d8836-1e55-402b-900e-62bd82cd5d36")
 	)
 	(wire
 		(pts
@@ -9101,6 +9105,16 @@
 	)
 	(wire
 		(pts
+			(xy 119.38 116.84) (xy 125.476 116.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3aa49cce-f85b-4724-8f22-c98222e23435")
+	)
+	(wire
+		(pts
 			(xy 126.238 155.194) (xy 126.238 161.29)
 		)
 		(stroke
@@ -9851,7 +9865,7 @@
 	)
 	(wire
 		(pts
-			(xy 83.566 96.52) (xy 86.36 96.52)
+			(xy 79.756 96.52) (xy 86.36 96.52)
 		)
 		(stroke
 			(width 0)
@@ -10041,16 +10055,6 @@
 	)
 	(wire
 		(pts
-			(xy 83.566 124.46) (xy 86.36 124.46)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "88fbe455-2c26-4044-ab86-6d4d6576b0fa")
-	)
-	(wire
-		(pts
 			(xy 107.95 34.29) (xy 107.95 35.56)
 		)
 		(stroke
@@ -10121,6 +10125,16 @@
 	)
 	(wire
 		(pts
+			(xy 74.93 119.38) (xy 86.36 119.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8d23d3f1-e49c-49ed-9eea-a22bfbd02049")
+	)
+	(wire
+		(pts
 			(xy 71.882 87.63) (xy 69.342 87.63)
 		)
 		(stroke
@@ -10148,16 +10162,6 @@
 			(type default)
 		)
 		(uuid "911718f5-c111-406f-bc1e-70984da50a62")
-	)
-	(wire
-		(pts
-			(xy 83.566 129.54) (xy 86.36 129.54)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "920c5184-63ca-4266-8b27-8e1daf8b26c7")
 	)
 	(polyline
 		(pts
@@ -10641,7 +10645,7 @@
 	)
 	(wire
 		(pts
-			(xy 123.9392 99.06) (xy 119.38 99.06)
+			(xy 129.54 99.06) (xy 119.38 99.06)
 		)
 		(stroke
 			(width 0)
@@ -10681,7 +10685,7 @@
 	)
 	(wire
 		(pts
-			(xy 119.38 93.98) (xy 122.174 93.98)
+			(xy 119.38 93.98) (xy 125.984 93.98)
 		)
 		(stroke
 			(width 0)
@@ -10911,17 +10915,7 @@
 	)
 	(wire
 		(pts
-			(xy 83.566 127) (xy 86.36 127)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "cc86280d-71ef-4933-9772-02d657038d9d")
-	)
-	(wire
-		(pts
-			(xy 123.9392 96.52) (xy 119.38 96.52)
+			(xy 129.54 96.52) (xy 119.38 96.52)
 		)
 		(stroke
 			(width 0)
@@ -11787,7 +11781,7 @@
 		)
 		(uuid "4f38c7cf-6ee0-4bb8-8c8c-fb941c4c6558")
 	)
-	(label "LED_G"
+	(label "PWM"
 		(at 125.73 129.54 180)
 		(fields_autoplaced yes)
 		(effects
@@ -11886,8 +11880,8 @@
 		)
 		(uuid "776272eb-ac0f-4758-9a71-86bd6d3f146b")
 	)
-	(label "TX"
-		(at 123.9392 99.06 180)
+	(label "RX_RADIO"
+		(at 129.54 99.06 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -11907,17 +11901,6 @@
 			(justify left bottom)
 		)
 		(uuid "84256f25-5821-4550-af43-47dbf47e68c9")
-	)
-	(label "S6"
-		(at 83.566 129.54 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "842aadab-13af-452e-a500-7f22af77c411")
 	)
 	(label "SCL"
 		(at 151.13 257.81 0)
@@ -11963,17 +11946,6 @@
 		)
 		(uuid "87ce9943-4889-4955-b277-3ba6596607c3")
 	)
-	(label "S4"
-		(at 83.566 124.46 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "889ae1a8-fc98-4506-b669-5efe0a052745")
-	)
 	(label "I1"
 		(at 82.55 101.6 0)
 		(fields_autoplaced yes)
@@ -12018,8 +11990,8 @@
 		)
 		(uuid "9ef65e9f-2000-42aa-865a-1350533c6334")
 	)
-	(label "S1"
-		(at 122.174 93.98 180)
+	(label "S1_RF"
+		(at 125.984 93.98 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -12128,8 +12100,8 @@
 		)
 		(uuid "b9e2a276-0f50-449f-99fc-1d20867abb82")
 	)
-	(label "RX"
-		(at 123.9392 96.52 180)
+	(label "TX_RADIO"
+		(at 129.54 96.52 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -12183,8 +12155,8 @@
 		)
 		(uuid "cafb23d6-7b17-4631-b559-3ee425abc760")
 	)
-	(label "S2"
-		(at 83.566 96.52 0)
+	(label "S2_RF"
+		(at 79.756 96.52 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -12193,6 +12165,17 @@
 			(justify left bottom)
 		)
 		(uuid "cb3a688a-8bb5-42e5-92bc-3a01d251ebaa")
+	)
+	(label "LED_G"
+		(at 125.476 116.84 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "d4343990-5732-43c0-b628-278206dafee3")
 	)
 	(label "PWM"
 		(at 262.89 200.66 0)
@@ -12227,6 +12210,17 @@
 		)
 		(uuid "dfe50478-d94f-42bf-bb62-7741458c3f53")
 	)
+	(label "RADIO_NRST"
+		(at 74.93 119.38 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e2f6f978-3b13-4868-af54-0e9a469d3fe3")
+	)
 	(label "NRST"
 		(at 77.724 62.23 0)
 		(fields_autoplaced yes)
@@ -12248,17 +12242,6 @@
 			(justify left bottom)
 		)
 		(uuid "ee692468-0940-4c13-8580-5773bb762a8c")
-	)
-	(label "S5"
-		(at 83.566 127 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "f0b54857-3b5b-4589-b6cd-3f65df8cfbbe")
 	)
 	(label "LED_G"
 		(at 126.238 155.194 270)
