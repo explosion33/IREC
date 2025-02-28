@@ -8312,12 +8312,20 @@
 		(uuid "bc7638c3-30bf-49c5-a5a2-c61c70ec1b28")
 	)
 	(no_connect
+		(at 86.36 99.06)
+		(uuid "ee6bede0-5ac0-4a75-b0f4-f019fd13fe51")
+	)
+	(no_connect
 		(at 234.188 207.518)
 		(uuid "f1e7b886-6817-49d3-b8aa-8780b95356c8")
 	)
 	(no_connect
 		(at 234.188 210.058)
 		(uuid "f1e7b886-6817-49d3-b8aa-8780b95356c9")
+	)
+	(no_connect
+		(at 86.36 101.6)
+		(uuid "f24ab498-b2c7-43c9-911c-9130ed6d4b0f")
 	)
 	(no_connect
 		(at 86.36 129.54)
@@ -8832,16 +8840,6 @@
 			(type default)
 		)
 		(uuid "280a6a34-c881-45a2-9704-62d45d9a4c84")
-	)
-	(wire
-		(pts
-			(xy 82.55 101.6) (xy 86.36 101.6)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "281a0930-6228-478a-8143-78e6b78ef352")
 	)
 	(wire
 		(pts
@@ -9602,16 +9600,6 @@
 			(type default)
 		)
 		(uuid "6656b0e8-80aa-48ef-9517-8db35e34ee7a")
-	)
-	(wire
-		(pts
-			(xy 82.55 99.06) (xy 86.36 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6a1bea14-b510-42c6-bbe2-adf0722384d6")
 	)
 	(wire
 		(pts
@@ -11649,17 +11637,6 @@
 		)
 		(uuid "14d8563a-d86b-4889-8873-aa1a4f5d5166")
 	)
-	(label "I2"
-		(at 82.55 99.06 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "1a9f2de4-42ef-4c12-b5b4-0c58e7aa371a")
-	)
 	(label "USB_D-"
 		(at 195.072 68.072 180)
 		(fields_autoplaced yes)
@@ -11945,17 +11922,6 @@
 			(justify right bottom)
 		)
 		(uuid "87ce9943-4889-4955-b277-3ba6596607c3")
-	)
-	(label "I1"
-		(at 82.55 101.6 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "905f6c99-a3d1-4c3e-8330-79900ddb0e65")
 	)
 	(label "E2A"
 		(at 76.2 116.84 0)
