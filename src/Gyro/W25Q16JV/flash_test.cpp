@@ -1,4 +1,5 @@
 #include "flash_test.h"
+#include "func.h"
 
 FlashTest::FlashTest(flash* flashMem, USBSerial* serial) {
     this->flashMem = flashMem;
@@ -14,7 +15,7 @@ void FlashTest::test_read_write_byte() {
     uint8_t testByte = 0xAB;
 
     flashMem->writeByte(address, testByte);
-    ThisThread::sleep_for(10ms);
+    wait(10);
 
     uint8_t readBack = flashMem->readByte(address);
     print_status("Write & Read Byte Test", readBack == testByte);
@@ -26,13 +27,12 @@ void FlashTest::test_read_write_page() {
     uint32_t size = 256;
     uint8_t writeData[256], readData[256];
 
-    // Fill test data
     for (uint32_t i = 0; i < size; i++) {
         writeData[i] = i % 256;
     }
 
     flashMem->writePage(page, offset, size, writeData);
-    ThisThread::sleep_for(50ms);
+    wait(50);
     flashMem->read(page, offset, size, readData);
 
     bool passed = true;
@@ -49,7 +49,7 @@ void FlashTest::test_read_write_page() {
 void FlashTest::test_erase_sector() {
     uint16_t sector = 1;
     flashMem->eraseSector(sector);
-    ThisThread::sleep_for(500ms);
+    wait(500);
 
     uint32_t startAddr = sector * 4096;
     bool erased = true;
@@ -65,25 +65,25 @@ void FlashTest::test_erase_sector() {
 
 void FlashTest::test_enable_disable_write() {
     flashMem->enableWrite();
-    ThisThread::sleep_for(5ms);
+    wait(5);
 
     flashMem->disableWrite();
-    ThisThread::sleep_for(5ms);
+    wait(5);
 
     print_status("Enable/Disable Write Test", true);
 }
 
 void FlashTest::test_reset() {
     flashMem->reset();
-    ThisThread::sleep_for(100ms);
+    wait(100]);
 
     uint8_t testByte = 0xCD;
     uint32_t address = 0x000002;
     flashMem->writeByte(address, testByte);
-    ThisThread::sleep_for(10ms);
+    wait(10]);
     
     flashMem->reset();
-    ThisThread::sleep_for(100ms);
+    wait(100]);
 
     uint8_t readBack = flashMem->readByte(address);
     print_status("Flash Reset Test", readBack == 0xFF);

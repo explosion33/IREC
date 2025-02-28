@@ -1,4 +1,5 @@
 #include "tmp102_test.h"
+#include "func.h"
 
 TMP102Test::TMP102Test(tmp102* sensor, USBSerial* serial) {
     this->sensor = sensor;
@@ -16,7 +17,7 @@ void TMP102Test::test_set_get_Temperature() {
 
 void TMP102Test::test_set_get_ShutDown() {
     sensor->shutDown();
-    ThisThread::sleep_for(10ms);
+    wait(10);
     
     char config[2];
     sensor->readData(TMP102_CONFIG, config, 2);
@@ -24,7 +25,7 @@ void TMP102Test::test_set_get_ShutDown() {
     print_status("Shutdown Mode Test", (config[0] & 0x01) == 0x01);
     
     sensor->turnOn();
-    ThisThread::sleep_for(10ms);
+    wait(10);
     sensor->readData(TMP102_CONFIG, config, 2);
 
     print_status("Turn On Test", (config[0] & 0x01) == 0x00);
@@ -32,7 +33,7 @@ void TMP102Test::test_set_get_ShutDown() {
 
 void TMP102Test::test_set_get_ComparatorMode() {
     sensor->setComparator();
-    ThisThread::sleep_for(10ms);
+    wait(10);
     
     char config[2];
     sensor->readData(TMP102_CONFIG, config, 2);
@@ -42,7 +43,7 @@ void TMP102Test::test_set_get_ComparatorMode() {
 
 void TMP102Test::test_set_get_InterruptMode() {
     sensor->setInterrupt();
-    ThisThread::sleep_for(10ms);
+    wait(10);
     
     char config[2];
     sensor->readData(TMP102_CONFIG, config, 2);
@@ -52,21 +53,21 @@ void TMP102Test::test_set_get_InterruptMode() {
 
 void TMP102Test::test_set_get_Polarity() {
     sensor->setPolarity(1);
-    ThisThread::sleep_for(10ms);
+    wait(10);
     
     char config[2];
     sensor->readData(TMP102_CONFIG, config, 2);
     print_status("Polarity High Test", (config[0] & 0x04) == 0x04);
 
     sensor->setPolarity(0);
-    ThisThread::sleep_for(10ms);
+    wait(10);
     sensor->readData(TMP102_CONFIG, config, 2);
     print_status("Polarity Low Test", (config[0] & 0x04) == 0x00);
 }
 
 void TMP102Test::test_set_get_FaultQueue() {
     sensor->setFaultQueue(2);
-    ThisThread::sleep_for(10ms);
+    wait(10);
     
     char config[2];
     sensor->readData(TMP102_CONFIG, config, 2);
@@ -76,7 +77,7 @@ void TMP102Test::test_set_get_FaultQueue() {
 
 void TMP102Test::test_set_get_ExtendedMode() {
     sensor->setEM(1);
-    ThisThread::sleep_for(10ms);
+    wait(10);
     
     char config[2];
     sensor->readData(TMP102_CONFIG, config, 2);
@@ -84,7 +85,7 @@ void TMP102Test::test_set_get_ExtendedMode() {
     print_status("Extended Mode Test", (config[1] & 0x10) == 0x10);
 
     sensor->setEM(0);
-    ThisThread::sleep_for(10ms);
+    wait(10);
     sensor->readData(TMP102_CONFIG, config, 2);
     
     print_status("Normal Mode Test", (config[1] & 0x10) == 0x00);
@@ -92,7 +93,7 @@ void TMP102Test::test_set_get_ExtendedMode() {
 
 void TMP102Test::test_set_get_OneShot() {
     sensor->oneShot();
-    ThisThread::sleep_for(10ms);
+    wait(10);
     
     char config[2];
     sensor->readData(TMP102_CONFIG, config, 2);
@@ -102,7 +103,7 @@ void TMP102Test::test_set_get_OneShot() {
 
 void TMP102Test::test_set_get_ConversionRate() {
     sensor->setConversion(3);
-    ThisThread::sleep_for(10ms);
+    wait(10);
     
     char config[2];
     sensor->readData(TMP102_CONFIG, config, 2);
@@ -112,7 +113,7 @@ void TMP102Test::test_set_get_ConversionRate() {
 
 void TMP102Test::test_set_get_HighLimit() {
     sensor->setHigh(30000);
-    ThisThread::sleep_for(10ms);
+    wait(10);
 
     char high[2];
     sensor->readData(TMP102_THIGH, high, 2);
@@ -123,7 +124,7 @@ void TMP102Test::test_set_get_HighLimit() {
 
 void TMP102Test::test_set_get_LowLimit() {
     sensor->setLow(10000);
-    ThisThread::sleep_for(10ms);
+    wait(10);
 
     char low[2];
     sensor->readData(TMP102_TLOW, low, 2);
