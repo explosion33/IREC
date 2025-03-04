@@ -128,7 +128,7 @@ int BNO055::getMagCalib(){
  * @param mode Power mode to set (Normal, LowPower, Suspend)
  */
 void BNO055::setPWR(PWRMode mode) {
-    char modeData = 0x00;
+    char modeData;
     switch(mode) {
         case PWRMode::Normal:   modeData = 0x00; break;
         case PWRMode::LowPower: modeData = 0x01; break;
@@ -143,7 +143,7 @@ void BNO055::setPWR(PWRMode mode) {
  */
 char BNO055::getOPMode() {
     setPage(0);
-    char mode = 0;
+    char mode;
     readData(BNO055_OPR_MODE, &mode, 1);
     return mode;
 }

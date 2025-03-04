@@ -2,7 +2,7 @@
 #define BNO055_TEST_H
 
 #include "mbed.h"
-#include "bno055.h"
+#include "BNO055.h"
 #include "USBSerial.h"
 
 class BNO055Test {
@@ -22,6 +22,8 @@ public:
     void test_set_get_SysTrigger();
     void test_reset();
     void run_all_tests();
+    void Dummy();
+    void test_page();
 
 private:
     BNO055* sensor;

@@ -1,9 +1,10 @@
 #include "mbed.h"
-// #include "BNO055.h"
+//#include "BNO055.h"
 #include "func.h"
 #include "EUSBSerial.h"
 #include "Servo.h"
-// #include "tmp102.h"
+#include "tmp102.h"
+#include "bno_test.h"
 DigitalOut led (PC_13); // Onboard LED
 //DigitalOut rst(PA_5); // RST pin for the BNO055
 //USBSerial serial; // for debug printing
@@ -47,7 +48,7 @@ DigitalOut led (PC_13); // Onboard LED
 //         wait(4000);
 //     }
 // }
-// BNO055 bno (PB_7, PB_6, 0x28 << 1);
+BNO055 bno (PB_7, PB_6, 0x28 << 1);
 // void bnoTest() {
 //     bno.setup();
 //     bno055_vector_t vec;   
@@ -59,23 +60,25 @@ DigitalOut led (PC_13); // Onboard LED
 // }
 //tmp102 tmp(PB_7, PB_6, 0x91);
 Servo myservo(PA_15); // motor pwm pin
-EUSBSerial serial;
+USBSerial serial;
 int main()
 {   
-    myservo = 0.0;
-    wait(500);
-    myservo = 1.0;
-    wait(8000);
-    myservo = 0.0;
-    wait(8000);
-    char buf[100] = {0};
-    while(1) {
-        if (serial.readline(buf, 100)){
-            int speed = 0;
-            sscanf(buf, "%d", &speed);
-            myservo = speed/100.0;
-        }
-    }
+    // myservo = 0.0;
+    // wait(500);
+    // myservo = 1.0;
+    // wait(8000);
+    // myservo = 0.0;
+    // wait(8000);
+    // char buf[100] = {0};
+    // while(1) {
+    //     if (serial.readline(buf, 100)){
+    //         int speed = 0;
+    //         sscanf(buf, "%d", &speed);
+    //         myservo = speed/100.0;
+    //     }
+    // }
+    BNO055Test test (&bno, &serial);
+    test.run_all_tests();
     
 
     

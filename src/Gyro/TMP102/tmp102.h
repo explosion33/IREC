@@ -20,7 +20,7 @@ public:
     tmp102(PinName SDA, PinName SCL, char addr);
     tmp102(I2C* i2c, char addr);
     ~tmp102();
-private:
+//private:
     I2C* i2c;
     char addr;
     int extendedMode;

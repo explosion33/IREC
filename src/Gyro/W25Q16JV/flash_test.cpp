@@ -75,15 +75,15 @@ void FlashTest::test_enable_disable_write() {
 
 void FlashTest::test_reset() {
     flashMem->reset();
-    wait(100]);
+    wait(100);
 
     uint8_t testByte = 0xCD;
     uint32_t address = 0x000002;
     flashMem->writeByte(address, testByte);
-    wait(10]);
+    wait(10);
     
     flashMem->reset();
-    wait(100]);
+    wait(100);
 
     uint8_t readBack = flashMem->readByte(address);
     print_status("Flash Reset Test", readBack == 0xFF);

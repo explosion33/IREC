@@ -1,4 +1,4 @@
-#include "tmp102_test.h"
+#include "tmp_test.h"
 #include "func.h"
 
 TMP102Test::TMP102Test(tmp102* sensor, USBSerial* serial) {
@@ -140,4 +140,4 @@ void TMP102Test::test_set_get_Alert() {
 
 void TMP102Test::test_reset() {
     sensor->reset();
-  
+}

@@ -1,5 +1,6 @@
-#include "bno055_test.h"
+#include "bno_test.h"
 #include "func.h"
+#include "bno055_const.h"
 
 BNO055Test::BNO055Test(BNO055* sensor, USBSerial* serial) {
     this->sensor = sensor;
@@ -10,8 +11,16 @@ void BNO055Test::print_status(const char* test_name, bool passed) {
     pc->printf("[%s] %s\n", passed ? "PASS" : "FAIL", test_name);
 }
 
+void BNO055Test::test_page(){
+    char expected_page = 0x01;
+    char page;
+    sensor->writeData(0x07, 0x01, 1);
+    sensor->readData(0x07, &page, 1);
+    print_status("Page Test", expected_page == page);
+}
+
 void BNO055Test::test_set_get_OPMode() {
-    char expected_mode = BNO055_OPERATION_MODE_IMU;
+    char expected_mode = BNO055_OPERATION_MODE_NDOF;
     sensor->setOPMode(expected_mode);
     wait(10);
     char actual_mode = sensor->getOPMode();
@@ -19,11 +28,12 @@ void BNO055Test::test_set_get_OPMode() {
 }
 
 void BNO055Test::test_set_get_PWRMode() {
-    PWRMode expected_mode = PWRMode::LowPower;
-    sensor->setPWR(expected_mode);
+    char expected_mode = 0x02;
+    sensor->setPWR(PWRMode::Suspend);
     wait(10);
     char actual_mode;
     sensor->readData(BNO055_PWR_MODE, &actual_mode, 1);
+    pc->printf("%x", actual_mode);
     print_status("Power Mode Test", actual_mode == expected_mode);
 }
 
@@ -96,8 +106,9 @@ void BNO055Test::test_reset() {
 }
 
 void BNO055Test::run_all_tests() {
-    test_set_get_OPMode();
-    test_set_get_PWRMode();
+    // test_page(); pass
+    // test_set_get_OPMode(); pass
+    // test_set_get_PWRMode(); pass
     test_set_get_ACCConfig();
     test_set_get_GYROConfig();
     test_set_get_MAGConfig();
