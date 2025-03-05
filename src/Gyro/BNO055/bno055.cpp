@@ -286,6 +286,9 @@ void BNO055::setAxes(Axes newX, Axes newY, Axes newZ, bool xNeg, bool yNeg, bool
     char axes = getAxes(newX, newY, newZ);
     writeData(BNO055_AXIS_MAP_CONFIG, axes, 1);
     wait(20);
+    char sign = getAxesSign(xNeg, yNeg, zNeg);
+    writeData(BNO055_AXIS_MAP_SIGN, sign, 1);
+    wait(20);
     // If sign inversion is desired, call setAxesSign(...) or integrate it here
 }
 
@@ -318,8 +321,8 @@ char BNO055::getAxesSign(bool xNeg, bool yNeg, bool zNeg) {
     // are placed in bits [0,1,2] respectively, but might also differ 
     // if you need xNeg in bit 0, yNeg in bit 1, zNeg in bit 2, etc.
     sign |= (xNeg ? 0x01 : 0x00);
-    sign |= (yNeg ? 0x01 : 0x00);
-    sign |= (zNeg ? 0x01 : 0x00);
+    sign |= (yNeg ? 0x02 : 0x00);
+    sign |= (zNeg ? 0x04 : 0x00);
     return sign;
 }
 
