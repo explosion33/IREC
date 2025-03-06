@@ -49,20 +49,9 @@ DigitalOut led (PC_13); // Onboard LED
 //     }
 // }
 BNO055 bno (PB_7, PB_6, 0x28 << 1);
-// void bnoTest() {
-//     bno.setup();
-//     bno055_vector_t vec;   
-//     while (true) {
-//         vec = bno.getGravity();
-//         serial.printf("%f, %f, %f \n", vec.x, vec.y, vec.z);
-//         wait(100);
-//     }
-// }
 //tmp102 tmp(PB_7, PB_6, 0x91);
 Servo myservo(PA_15); // motor pwm pin
-USBSerial serial;
-int main()
-{   
+void motor(){
     // myservo = 0.0;
     // wait(500);
     // myservo = 1.0;
@@ -77,9 +66,10 @@ int main()
     //         myservo = speed/100.0;
     //     }
     // }
-    BNO055Test test (&bno, &serial);
-    test.run_all_tests();
-    
-
+}
+USBSerial serial;
+int main()
+{   
+    I2C i2c(PB_7, PB_6);
     
 }

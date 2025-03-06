@@ -1,85 +1,83 @@
-#include "mbed.h"
-#include "encoder.h"
+#include "Encoder.h"
 
-encoder::encoder(PinName A, PinName B) : pinA(A), pinB(B) {     
-    position = 0;
-    lastState = 0;
-    direction = 0;
+// Lookup table for quadrature transitions: oldState (2 bits) -> newState (2 bits).
+// Index = (oldState << 2) | (newState). Each entry is -1, 0, or +1.
+static const int8_t _transitionTable[16] = {
+ // new = 00, 01, 10, 11
+ /* old=00 */  0,  +1,  -1,  0,
+ /* old=01 */ -1,   0,   0, +1,
+ /* old=10 */ +1,   0,   0, -1,
+ /* old=11 */  0,  -1,  +1,  0
+};
+
+Encoder::Encoder(PinName channelA, PinName channelB, int pulsesPerRev)
+    : _chanA(channelA),
+      _chanB(channelB),
+      _position(0),
+      _pulsesPerRev(pulsesPerRev),
+      _prevState(0),
+      _direction(0)
+{
+    // Read the initial state of A and B
+    uint8_t A = _chanA.read();
+    uint8_t B = _chanB.read();
+    _prevState = (A << 1) | B;
+
+    // Attach the same ISR to all edges on both channels
+    _chanA.rise(callback(this, &Encoder::encodeISR));
+    _chanA.fall(callback(this, &Encoder::encodeISR));
+    _chanB.rise(callback(this, &Encoder::encodeISR));
+    _chanB.fall(callback(this, &Encoder::encodeISR));
 }
 
-void encoder::setup(){
-    pinA.mode(PullUp);
-    pinB.mode(PullUp);
-    lastState = (static_cast<uint8_t>(pinA.read()) << 1) | pinB.read();
-
-    pinA.fall(callback(this, &encoder::interruptA));
-    pinA.rise(callback(this, &encoder::interruptA));
-    pinB.fall(callback(this, &encoder::interruptB));
-    pinB.rise(callback(this, &encoder::interruptB));
-}
-int16_t encoder::getPos(){
-    __disable_irq();
-    int32_t pos = position;
-    __enable_irq();
-    return pos;
+int Encoder::getCount() const {
+    return _position;
 }
 
-int encoder::getDirection(){
-    __disable_irq();
-    int dir = direction;
-    __enable_irq();
-    return dir;
+float Encoder::getOrientationDegrees() const {
+    // Convert count to degrees
+    return (static_cast<float>(_position) / _pulsesPerRev) * 360.0f;
 }
 
-void encoder::reset(){
-    __disable_irq();
-    position = 0;
-    direction = 0;
-    __enable_irq();
+float Encoder::getOrientationRadians() const {
+    // Convert count to radians
+    // 2 * PI * (position / pulsesPerRev)
+    static const float PI = 3.14159265358979f;
+    return (static_cast<float>(_position) / _pulsesPerRev) * (2.0f * PI);
 }
 
-float encoder::getAngleDeg(){
-    float revolutions = static_cast<float>(position) / (ppR * 4); // 4 counts per pulse
-    revolutions /= gearRatio;
-    return revolutions * 360.0f;
+int Encoder::getDirection() const {
+    return _direction;
 }
 
-float encoder::getAngleRad(){
-    float revolutions = static_cast<float>(position) / (ppR * 4); // 4 counts per pulse
-    revolutions /= gearRatio;
-    return revolutions * 2.0f * 3.14;
+void Encoder::reset() {
+    _position = 0;
+    _direction = 0;
 }
 
-void encoder::interruptA(){
-    uint8_t currentA = pinA.read();
-    uint8_t currentB = pinB.read();
-    uint8_t state = (currentA << 1) | currentB;
-    processState(state);
-}
+void Encoder::encodeISR() {
+    // Read current A,B state
+    uint8_t A = _chanA.read();
+    uint8_t B = _chanB.read();
+    uint8_t newState = (A << 1) | B;
 
-void encoder::interruptB(){
-    uint8_t currentA = pinA.read();
-    uint8_t currentB = pinB.read();
-    uint8_t state = (currentA << 1) | currentB;
-    processState(state);
-}
+    // Determine how the position changes
+    uint8_t index = (_prevState << 2) | newState;
+    int8_t step = _transitionTable[index];
 
-void encoder::processState(uint8_t state){
-    uint8_t prev = lastState;
-    lastState = state;
+    // Update the count
+    _position += step;
 
-    int8_t diff = (prev << 2) | state;
-    static const int8_t lookup[16] = {
-        0,  -1, 1,  0,
-        1,  0,  0, -1,
-        -1, 0,  0, 1,
-        0,  1, -1, 0
-    };
-
-    int8_t movement = lookup[diff & 0x0F];
-
-    if (movement != 0) {
-        position += movement;
-        direction = movement;
+    // Update direction based on step
+    // step > 0 => forward, step < 0 => backward, step = 0 => no valid change
+    if (step > 0) {
+        _direction = 1;
+    } else if (step < 0) {
+        _direction = -1;
+    } else {
+        _direction = 0;
     }
+
+    // Save new state
+    _prevState = newState;
 }
