@@ -4,24 +4,24 @@
 #include "EUSBSerial.h"
 #include "Servo.h"
 #include "tmp102.h"
+#include "encoder_i2c.h"
 #include "bno_test.h"
 DigitalOut led (PC_13); // Onboard LED
 //DigitalOut rst(PA_5); // RST pin for the BNO055
-//USBSerial serial; // for debug printing
+USBSerial serial;
 
-
-// I2C i2c(PB_7, PB_6); 
-// int ack; 
-// int address;  
-// void scanI2C() {
-//   for(address=1;address<255;address++) {    
-//     ack = i2c.write(address, "11", 1);
-//     if (ack == 0) {
-//        serial.printf("\tFound at %3d -- %3x\r\n", address,address);
-//     }    
-//     wait(50);
-//   } 
-// } 
+I2C i2c(PB_7, PB_6); 
+int ack; 
+int address;  
+void scanI2C() {
+  for(address=1;address<255;address++) {    
+    ack = i2c.write(address, "11", 1);
+    if (ack == 0) {
+       serial.printf("\tFound at %3d -- %3x\r\n", address,address);
+    }    
+    wait(50);
+  } 
+} 
 // void startESC() {
 //     myservo = 0.0;
 //     wait(500);
@@ -67,9 +67,21 @@ void motor(){
     //     }
     // }
 }
-USBSerial serial;
+DigitalIn A (PB_4);
 int main()
 {   
-    I2C i2c(PB_7, PB_6);
-    
+    // int lastA;
+    // while(1){
+    //     // scanI2C();
+    //     // wait(100);
+    //     // serial.printf("Running");
+    //     if (A != lastA){
+    //         lastA = A;
+    //         serial.printf("A");
+    //     }
+    // }
+    encoder encoder (PB_13, PB_12, 64);
+    while(1){
+        serial.printf("%d", encoder.getCount());
+    }
 }

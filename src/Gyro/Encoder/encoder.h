@@ -10,7 +10,7 @@
  * Provides getters for count, orientation (degrees, radians), 
  * and last direction of movement.
  */
-class Encoder {
+class encoder {
 public:
     /**
      * @param channelA      PinName for Encoder Channel A
@@ -19,7 +19,7 @@ public:
      *                      If you are using full quadrature (rising/falling on both channels),
      *                      you may be effectively getting 4x that in actual counts.
      */
-    Encoder(PinName channelA, PinName channelB, int pulsesPerRev);
+    encoder(PinName channelA, PinName channelB, int pulsesPerRev);
 
     /**
      * @return Current encoder count (pulses) relative to the starting position.

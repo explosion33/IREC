@@ -1,4 +1,4 @@
-#include "Encoder.h"
+#include "encoder.h"
 
 // Lookup table for quadrature transitions: oldState (2 bits) -> newState (2 bits).
 // Index = (oldState << 2) | (newState). Each entry is -1, 0, or +1.
@@ -10,7 +10,7 @@ static const int8_t _transitionTable[16] = {
  /* old=11 */  0,  -1,  +1,  0
 };
 
-Encoder::Encoder(PinName channelA, PinName channelB, int pulsesPerRev)
+encoder::encoder(PinName channelA, PinName channelB, int pulsesPerRev)
     : _chanA(channelA),
       _chanB(channelB),
       _position(0),
@@ -24,38 +24,38 @@ Encoder::Encoder(PinName channelA, PinName channelB, int pulsesPerRev)
     _prevState = (A << 1) | B;
 
     // Attach the same ISR to all edges on both channels
-    _chanA.rise(callback(this, &Encoder::encodeISR));
-    _chanA.fall(callback(this, &Encoder::encodeISR));
-    _chanB.rise(callback(this, &Encoder::encodeISR));
-    _chanB.fall(callback(this, &Encoder::encodeISR));
+    _chanA.rise(callback(this, &encoder::encodeISR));
+    _chanA.fall(callback(this, &encoder::encodeISR));
+    _chanB.rise(callback(this, &encoder::encodeISR));
+    _chanB.fall(callback(this, &encoder::encodeISR));
 }
 
-int Encoder::getCount() const {
+int encoder::getCount() const {
     return _position;
 }
 
-float Encoder::getOrientationDegrees() const {
+float encoder::getOrientationDegrees() const {
     // Convert count to degrees
     return (static_cast<float>(_position) / _pulsesPerRev) * 360.0f;
 }
 
-float Encoder::getOrientationRadians() const {
+float encoder::getOrientationRadians() const {
     // Convert count to radians
     // 2 * PI * (position / pulsesPerRev)
     static const float PI = 3.14159265358979f;
     return (static_cast<float>(_position) / _pulsesPerRev) * (2.0f * PI);
 }
 
-int Encoder::getDirection() const {
+int encoder::getDirection() const {
     return _direction;
 }
 
-void Encoder::reset() {
+void encoder::reset() {
     _position = 0;
     _direction = 0;
 }
 
-void Encoder::encodeISR() {
+void encoder::encodeISR() {
     // Read current A,B state
     uint8_t A = _chanA.read();
     uint8_t B = _chanB.read();
