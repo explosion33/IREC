@@ -4,8 +4,7 @@
 #include "mbed.h"
 
 /**
- * @brief A software-based quadrature encoder class optimized 
- *        with a single interrupt handler and a lookup table.
+ * @brief A quadrature encoder that operates using a look up table
  *
  * Provides getters for count, orientation (degrees, radians), 
  * and last direction of movement.
@@ -16,8 +15,6 @@ public:
      * @param channelA      PinName for Encoder Channel A
      * @param channelB      PinName for Encoder Channel B
      * @param pulsesPerRev  PPR (pulses per revolution) for one channel.
-     *                      If you are using full quadrature (rising/falling on both channels),
-     *                      you may be effectively getting 4x that in actual counts.
      */
     encoder(PinName channelA, PinName channelB, int pulsesPerRev);
 

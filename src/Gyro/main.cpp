@@ -4,7 +4,7 @@
 #include "EUSBSerial.h"
 #include "Servo.h"
 #include "tmp102.h"
-#include "encoder_i2c.h"
+#include "AS5601.h"
 #include "bno_test.h"
 DigitalOut led (PC_13); // Onboard LED
 //DigitalOut rst(PA_5); // RST pin for the BNO055
