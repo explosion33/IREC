@@ -34,6 +34,11 @@ public:
     float getOrientationRadians() const;
 
     /**
+     * @return Relative number of revolutions, from the starting position
+     */
+    float getRevolutions() const;
+
+    /**
      * @return Last movement direction:
      *          +1 = forward, -1 = backward, 0 = no movement or invalid step
      */

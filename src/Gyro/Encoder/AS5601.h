@@ -26,6 +26,8 @@ public:
                PinName sda, PinName scl, int i2cFreq = 100000,
                char deviceAddr = 0x50);
 
+    ~AS5601();
+    
     // -------------------------
     // Forwarded methods to Encoder
     // -------------------------
@@ -35,10 +37,11 @@ public:
     int getDirection() const;
     void reset();
 
+
 private:
     encoder _encoder;   ///< The quadrature decoder instance
-    I2C     _i2c;       ///< The I2C interface
-    char    _i2cAddr;   ///< Address of the external I2C device
+    I2C*     _i2c;       ///< The I2C interface
+    char    _addr;   ///< Address of the external I2C device
 };
 
 #endif // AS5601_H

@@ -41,6 +41,10 @@ float encoder::getOrientationRadians() const {
     return (static_cast<float>(_position) / _pulsesPerRev) * (2.0f * PI);
 }
 
+float encoder::getRevolutions() const {
+    return (static_cast<float>(_position) / _pulsesPerRev);
+}
+
 int encoder::getDirection() const {
     return _direction;
 }

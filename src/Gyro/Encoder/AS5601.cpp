@@ -3,10 +3,13 @@
 AS5601::AS5601(PinName channelA, PinName channelB, int pulsesPerRev,
                        PinName sda, PinName scl, int i2cFreq, char deviceAddr)
     : _encoder(channelA, channelB, pulsesPerRev),
-      _i2c(sda, scl), 
-      _i2cAddr(deviceAddr)
+      _addr(deviceAddr)
 {
-    _i2c.frequency(i2cFreq);
+    _i2c = new I2C(sda, scl);
+}
+
+AS5601::~AS5601(){
+    delete _i2c;
 }
 
 int AS5601::getCount() const {

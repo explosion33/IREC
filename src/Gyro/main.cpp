@@ -14,7 +14,7 @@ I2C i2c(PB_7, PB_6);
 int ack; 
 int address;  
 void scanI2C() {
-  for(address=1;address<255;address++) {    
+  for(address=0;address<255;address++) {    
     ack = i2c.write(address, "11", 1);
     if (ack == 0) {
        serial.printf("\tFound at %3d -- %3x\r\n", address,address);
@@ -71,17 +71,8 @@ DigitalIn A (PB_4);
 int main()
 {   
     // int lastA;
-    // while(1){
-    //     // scanI2C();
-    //     // wait(100);
-    //     // serial.printf("Running");
-    //     if (A != lastA){
-    //         lastA = A;
-    //         serial.printf("A");
-    //     }
-    // }
-    encoder encoder (PB_13, PB_12, 64);
+    encoder encoder (PB_13, PB_12, 8);
     while(1){
-        serial.printf("%d", encoder.getCount());
+        serial.printf("%f\n", encoder.getRevolutions());
     }
 }
