@@ -1,11 +1,13 @@
 #include "mbed.h"
-//#include "BNO055.h"
+#include "BNO055.h"
 #include "func.h"
 #include "EUSBSerial.h"
 #include "Servo.h"
 #include "tmp102.h"
 #include "AS5601.h"
-#include "bno_test.h"
+#include "flash_test.h"
+//#include "tmp_test.h"
+//#include "bno_test.h"
 DigitalOut led (PC_13); // Onboard LED
 //DigitalOut rst(PA_5); // RST pin for the BNO055
 USBSerial serial;
@@ -48,9 +50,10 @@ void scanI2C() {
 //         wait(4000);
 //     }
 // }
-BNO055 bno (PB_7, PB_6, 0x28 << 1);
+//BNO055 bno (PB_7, PB_6, 0x28 << 1);
 //tmp102 tmp(PB_7, PB_6, 0x91);
-Servo myservo(PA_15); // motor pwm pin
+//Servo myservo(PA_15); // motor pwm pin
+flash flash (PA_7, PA_6, PA_5, PA_4);
 void motor(){
     // myservo = 0.0;
     // wait(500);
@@ -67,12 +70,8 @@ void motor(){
     //     }
     // }
 }
-DigitalIn A (PB_4);
 int main()
 {   
-    // int lastA;
-    encoder encoder (PB_13, PB_12, 8);
-    while(1){
-        serial.printf("%f\n", encoder.getRevolutions());
-    }
+    FlashTest test (&flash, &serial);
+    test.run_all_tests();
 }

@@ -1,5 +1,6 @@
 #include "flash_test.h"
 #include "func.h"
+#include "mbed.h"
 
 FlashTest::FlashTest(flash* flashMem, USBSerial* serial) {
     this->flashMem = flashMem;
@@ -15,28 +16,26 @@ void FlashTest::test_read_write_byte() {
     uint8_t testByte = 0xAB;
 
     flashMem->writeByte(address, testByte);
-    wait(10);
+    ThisThread::sleep_for(10ms);
 
     uint8_t readBack = flashMem->readByte(address);
     print_status("Write & Read Byte Test", readBack == testByte);
 }
 
 void FlashTest::test_read_write_page() {
-    uint32_t page = 2;
-    uint16_t offset = 0;
-    uint32_t size = 256;
+    uint32_t address = 0x000100;  // Page-aligned address
     uint8_t writeData[256], readData[256];
 
-    for (uint32_t i = 0; i < size; i++) {
+    for (uint32_t i = 0; i < 256; i++) {
         writeData[i] = i % 256;
     }
 
-    flashMem->writePage(page, offset, size, writeData);
-    wait(50);
-    flashMem->read(page, offset, size, readData);
+    flashMem->write(address, writeData, 256);
+    ThisThread::sleep_for(50ms);
+    flashMem->read(address, readData, 256);
 
     bool passed = true;
-    for (uint32_t i = 0; i < size; i++) {
+    for (uint32_t i = 0; i < 256; i++) {
         if (readData[i] != writeData[i]) {
             passed = false;
             break;
@@ -47,14 +46,16 @@ void FlashTest::test_read_write_page() {
 }
 
 void FlashTest::test_erase_sector() {
-    uint16_t sector = 1;
-    flashMem->eraseSector(sector);
-    wait(500);
+    uint32_t sector_address = 0x000000;
+    flashMem->eraseSector(sector_address);
+    ThisThread::sleep_for(500ms);
 
-    uint32_t startAddr = sector * 4096;
     bool erased = true;
+    uint8_t readBuffer[256];
+    flashMem->read(sector_address, readBuffer, 256);
+
     for (uint32_t i = 0; i < 256; i++) {
-        if (flashMem->readByte(startAddr + i) != 0xFF) {
+        if (readBuffer[i] != 0xFF) {
             erased = false;
             break;
         }
@@ -65,34 +66,50 @@ void FlashTest::test_erase_sector() {
 
 void FlashTest::test_enable_disable_write() {
     flashMem->enableWrite();
-    wait(5);
+    ThisThread::sleep_for(5ms);
 
     flashMem->disableWrite();
-    wait(5);
+    ThisThread::sleep_for(5ms);
 
     print_status("Enable/Disable Write Test", true);
 }
 
 void FlashTest::test_reset() {
-    flashMem->reset();
-    wait(100);
-
-    uint8_t testByte = 0xCD;
     uint32_t address = 0x000002;
+    uint8_t testByte = 0xCD;
+
     flashMem->writeByte(address, testByte);
-    wait(10);
+    ThisThread::sleep_for(10ms);
+
+    uint8_t readBeforeReset = flashMem->readByte(address);
     
     flashMem->reset();
-    wait(100);
+    ThisThread::sleep_for(100ms);
 
-    uint8_t readBack = flashMem->readByte(address);
-    print_status("Flash Reset Test", readBack == 0xFF);
+    uint8_t readAfterReset = flashMem->readByte(address);
+    print_status("Flash Reset Test", readBeforeReset == testByte && readAfterReset == 0xFF);
+}
+
+void FlashTest::test_read_write_float() {
+    uint32_t address = 0x000010;
+    float testValue = 123.456f;
+
+    flashMem->writeNum(address, testValue);
+    ThisThread::sleep_for(10ms);
+
+    float readValue = flashMem->readNum(address);
+    print_status("Write & Read Float Test", fabs(readValue - testValue) < 0.001f);
 }
 
 void FlashTest::run_all_tests() {
+    pc->printf("\nRunning W25Q16JV Flash Tests...\n");
+
     test_read_write_byte();
     test_read_write_page();
     test_erase_sector();
     test_enable_disable_write();
     test_reset();
+    test_read_write_float();
+
+    pc->printf("\nAll flash tests completed.\n");
 }

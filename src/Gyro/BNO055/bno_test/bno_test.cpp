@@ -116,15 +116,15 @@ void BNO055Test::test_reset() {
 }
 
 void BNO055Test::run_all_tests() {
-    // test_page(); pass
-    // test_set_get_OPMode(); PASS
-    // test_set_get_PWRMode(); PASS
-    // test_set_get_ACCConfig(); PASS
-    // test_set_get_GYROConfig(); PASS
-    // test_set_get_MAGConfig(); PASS
-    // test_set_get_Axes(); PASS
-    // test_set_get_TemperatureSource(); PASS
-    // test_set_get_UnitConfig(); PASS
-    // test_set_get_SysTrigger(); PASS
-    // test_reset(); PASS
+    test_page(); 
+    test_set_get_OPMode(); 
+    test_set_get_PWRMode(); 
+    test_set_get_ACCConfig(); 
+    test_set_get_GYROConfig(); 
+    test_set_get_MAGConfig(); 
+    test_set_get_Axes(); 
+    test_set_get_TemperatureSource(); 
+    test_set_get_UnitConfig(); 
+    test_set_get_SysTrigger(); 
+    test_reset(); 
 }

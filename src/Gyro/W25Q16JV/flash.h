@@ -5,30 +5,38 @@
 
 class flash {
 public:
+    // Constructor
     flash(PinName mosi, PinName miso, PinName sclk, PinName csPin);
-    void csLow();
-    void csHigh();
-    void read(uint32_t startPage, uint8_t offset, uint32_t size, uint8_t *rData);
-    void fastRead(uint32_t startPage, uint8_t offset, uint32_t size, uint8_t *rData);
+
+    // Read operations
+    void read(uint32_t address, uint8_t *buffer, size_t length);
+    uint8_t readByte(uint32_t address);
+    float readNum(uint32_t address);
+
+    // Write operations
+    void write(uint32_t address, const uint8_t *buffer, size_t length);
+    void writeByte(uint32_t address, uint8_t data);
+    void writeNum(uint32_t address, float data);
+
+    // Erase operations
+    void eraseSector(uint32_t address);
+
+    // Control operations
     void enableWrite();
     void disableWrite();
-    void eraseSector(uint16_t sector);
-    void write(uint32_t page, uint16_t offset, uint32_t size, uint8_t *data);
-    uint8_t readByte(uint32_t Addr);
-    void writeByte(uint32_t Addr, uint8_t data);
-    void writePage(uint32_t page, uint16_t offset, uint32_t size, uint8_t *data);
     void reset();
 
 private:
-    uint32_t bytestowrite(uint32_t size, uint16_t offset);
-    uint16_t bytestomodify(uint32_t size, uint32_t offset);
-    SPI _spi;
-    DigitalOut _cs;
+    SPI _spi;       // SPI communication interface
+    DigitalOut _cs; // Chip Select (CS) pin
+
+    // Helper functions for SPI communication
+    void csLow();
+    void csHigh();
 };
 
+// Float conversion functions
 void float2Byte(uint8_t *ftoa_bytes_temp, float float_variable);
 float bytes2float(uint8_t *ftoa_bytes_temp);
-void writeNum(uint32_t page, uint16_t offset, float data);
-float readNum(uint32_t page, uint16_t offset);
 
-#endif
+#endif // FLASH_H
