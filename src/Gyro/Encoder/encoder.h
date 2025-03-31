@@ -4,68 +4,78 @@
 #include "mbed.h"
 
 /**
- * @brief A quadrature encoder that operates using a look up table
+ * @brief A quadrature encoder class that uses interrupts and a lookup table
+ *        to track position and direction.
  *
- * Provides getters for count, orientation (degrees, radians), 
- * and last direction of movement.
+ * Provides thread-safe access to encoder pulse count, orientation in degrees/radians,
+ * number of revolutions, and last movement direction.
  */
 class encoder {
 public:
     /**
-     * @param channelA      PinName for Encoder Channel A
-     * @param channelB      PinName for Encoder Channel B
-     * @param pulsesPerRev  PPR (pulses per revolution) for one channel.
+     * @brief Construct a new encoder object with two input channels.
+     * 
+     * @param channelA      PinName for encoder channel A.
+     * @param channelB      PinName for encoder channel B.
+     * @param pulsesPerRev  Number of pulses per full revolution (PPR) for one channel.
      */
     encoder(PinName channelA, PinName channelB, int pulsesPerRev);
 
     /**
-     * @return Current encoder count (pulses) relative to the starting position.
+     * @brief Get the current pulse count relative to the starting/reset position.
+     * 
+     * @return int Current encoder count.
      */
     int getCount() const;
 
     /**
-     * @return Absolute orientation in degrees, from the starting position.
+     * @brief Get the absolute orientation in degrees.
+     * 
+     * @return float Orientation in degrees [0, 360) relative to reset position.
      */
     float getOrientationDegrees() const;
 
     /**
-     * @return Absolute orientation in radians, from the starting position.
+     * @brief Get the absolute orientation in radians.
+     * 
+     * @return float Orientation in radians [0, 2π) relative to reset position.
      */
     float getOrientationRadians() const;
 
     /**
-     * @return Relative number of revolutions, from the starting position
+     * @brief Get the total number of revolutions since reset.
+     * 
+     * @return float Relative revolutions (can be fractional).
      */
     float getRevolutions() const;
 
     /**
-     * @return Last movement direction:
-     *          +1 = forward, -1 = backward, 0 = no movement or invalid step
+     * @brief Get the last detected direction of movement.
+     * 
+     * @return int +1 (forward), -1 (backward), or 0 (no movement or invalid step).
      */
     int getDirection() const;
 
     /**
-     * @brief Reset the encoder count to zero (and direction to 0).
+     * @brief Reset encoder count and direction to zero.
      */
     void reset();
 
 private:
     /**
-     * @brief Common interrupt service routine for any change on Channel A or B.
+     * @brief Interrupt handler called on any edge of either channel.
+     *        Computes new state and updates position and direction.
      */
     void encodeISR();
 
 private:
-    InterruptIn _chanA;
-    InterruptIn _chanB;
+    InterruptIn _chanA;         ///< Encoder input channel A
+    InterruptIn _chanB;         ///< Encoder input channel B
 
-    volatile int    _position;      ///< Current pulse count
-    const int       _pulsesPerRev;  ///< Nominal pulses per revolution (one channel)
-    volatile uint8_t _prevState;    ///< Previous 2-bit state of (A,B)
-
-    // We'll store the last direction of movement:
-    // +1 = forward, -1 = backward, 0 = no valid change
-    volatile int    _direction;
+    volatile int _position;     ///< Current encoder position (pulse count)
+    const int _pulsesPerRev;    ///< Pulses per full revolution
+    volatile uint8_t _prevState;///< Previous 2-bit state of (A, B)
+    volatile int _direction;    ///< Last detected direction of rotation
 };
 
 #endif // ENCODER_H
