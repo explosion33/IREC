@@ -10,7 +10,7 @@
 //#include "bno_test.h"
 DigitalOut led (PC_13); // Onboard LED
 //DigitalOut rst(PA_5); // RST pin for the BNO055
-USBSerial serial;
+EUSBSerial serial;
 
 I2C i2c(PB_7, PB_6); 
 int ack; 
@@ -52,8 +52,8 @@ void scanI2C() {
 // }
 //BNO055 bno (PB_7, PB_6, 0x28 << 1);
 //tmp102 tmp(PB_7, PB_6, 0x91);
-//Servo myservo(PA_15); // motor pwm pin
-flash flash (PA_7, PA_6, PA_5, PA_4);
+Servo myservo(PA_15); // motor pwm pin
+//flash flash (PA_7, PA_6, PA_5, PA_4);
 void motor(){
     // myservo = 0.0;
     // wait(500);
@@ -72,6 +72,18 @@ void motor(){
 }
 int main()
 {   
-    FlashTest test (&flash, &serial);
-    test.run_all_tests();
+    myservo = 0.0;
+    wait(500);
+    myservo = 1.0;
+    wait(8000);
+    myservo = 0.0;
+    wait(8000);
+    char buf[100] = {0};
+    while(1) {
+        if (serial.readline(buf, 100)){
+            int speed = 0;
+            sscanf(buf, "%d", &speed);
+            myservo = speed/100.0;
+        }
+    }
 }
