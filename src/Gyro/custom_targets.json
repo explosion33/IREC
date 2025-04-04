@@ -52,5 +52,22 @@
             "0740"
         ],
         "device_name": "MCU_STM32F411CE"
+    },
+    "ARES": {
+        "inherits": ["MCU_STM32F4"],
+        "macros_add": [
+            "STM32F401xC",
+            "HSE_VALUE=16000000U"
+        ],
+        "overrides": {
+            "lse_available": 1
+        },
+        "device_has_add": [
+            "USBDEVICE"
+        ],
+        "bootloader_supported": true,
+        "extra_labels_add": ["ARES"],
+        "detect_code": ["1234"],
+        "device_name": "STM32F401CCUx"
     }
 }

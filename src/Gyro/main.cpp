@@ -5,25 +5,25 @@
 #include "Servo.h"
 #include "tmp102.h"
 #include "AS5601.h"
-#include "flash_test.h"
+//#include "flash_test.h"
 //#include "tmp_test.h"
 //#include "bno_test.h"
-DigitalOut led (PC_13); // Onboard LED
+//DigitalOut led (PC_13); // Onboard LED
 //DigitalOut rst(PA_5); // RST pin for the BNO055
-EUSBSerial serial;
+EUSBSerial serial(0x3232, 0x1);
 
-I2C i2c(PB_7, PB_6); 
-int ack; 
-int address;  
-void scanI2C() {
-  for(address=0;address<255;address++) {    
-    ack = i2c.write(address, "11", 1);
-    if (ack == 0) {
-       serial.printf("\tFound at %3d -- %3x\r\n", address,address);
-    }    
-    wait(50);
-  } 
-} 
+// I2C i2c(PB_7, PB_8); 
+// int ack; 
+// int address;  
+// void scanI2C() {
+//   for(address=0;address<255;address++) {    
+//     ack = i2c.write(address, "11", 1);
+//     if (ack == 0) {
+//        serial.printf("\tFound at %3d -- %3x\r\n", address,address);
+//     }    
+//     wait(50);
+//   } 
+// } 
 // void startESC() {
 //     myservo = 0.0;
 //     wait(500);
@@ -50,9 +50,9 @@ void scanI2C() {
 //         wait(4000);
 //     }
 // }
-//BNO055 bno (PB_7, PB_6, 0x28 << 1);
+//BNO055 bno (PB_7, PB_8, 0x28 << 1);
 //tmp102 tmp(PB_7, PB_6, 0x91);
-Servo myservo(PA_15); // motor pwm pin
+//Servo myservo(PA_15); // motor pwm pin
 //flash flash (PA_7, PA_6, PA_5, PA_4);
 void motor(){
     // myservo = 0.0;
@@ -72,18 +72,10 @@ void motor(){
 }
 int main()
 {   
-    myservo = 0.0;
-    wait(500);
-    myservo = 1.0;
-    wait(8000);
-    myservo = 0.0;
-    wait(8000);
-    char buf[100] = {0};
-    while(1) {
-        if (serial.readline(buf, 100)){
-            int speed = 0;
-            sscanf(buf, "%d", &speed);
-            myservo = speed/100.0;
-        }
+    while(1){
+        //serial.printf("%f", bno.getEuler().x);
+        serial.printf("Hello World\n");
+        ThisThread::sleep_for(500ms);
+
     }
 }
