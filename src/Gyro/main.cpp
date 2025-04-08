@@ -6,9 +6,7 @@
 #include "tmp102.h"
 #include "AS5601.h"
 #include "flash.h"
-//#include "flash_test.h"
-//#include "tmp_test.h"
-//#include "bno_test.h"
+
 //DigitalOut led (PC_13); // Onboard LED
 //DigitalOut rst(PA_5); // RST pin for the BNO055
 EUSBSerial serial(0x3232, 0x1);
@@ -25,84 +23,44 @@ void scanI2C() {
     wait(50);
   } 
 } 
-// void startESC() {
-//     myservo = 0.0;
-//     wait(500);
-//     myservo = 1.0;
-//     wait(8000);
-//     myservo = 0.0;
-//     wait(8000);
-// }
 
-// void motorTest() {
-//     startESC();
-//     while (1) {
-//         for (float p=0.0; p<=1.0; p += 0.025) { //Throttle up slowly to full throttle
-//             myservo = p;
-//             wait(1000);
-//         }
-//         myservo = 0.0; //Motor off
-//         wait(4000);
-//         for (float p=1.0; p>=0.0; p -= 0.025) { //Throttle down slowly from full throttle
-//             myservo = p;
-//             wait(1000);
-//         }
-//         myservo = 0.0; //Motor off
-//         wait(4000);
-//     }
-// }
-//BNO055 bno (PB_7, PB_8, 0x28 << 1);
+BNO055 bno (PB_7, PB_8, 0x28 << 1);
 //tmp102 tmp(PB_7, PB_6, 0x91);
 //Servo myservo(PA_15); // motor pwm pin
-//flash flash (PA_7, PA_6, PA_5, PA_4);
-//Ticker logTicker;
+flash flash (PA_7, PA_6, PA_5, PA_4);
+Ticker logTicker;
 #define FLASH_START_ADDR 0x000000
 uint32_t writeAddr = FLASH_START_ADDR;
-void motor(){
-    // myservo = 0.0;
-    // wait(500);
-    // myservo = 1.0;
-    // wait(8000);
-    // myservo = 0.0;
-    // wait(8000);
-    // char buf[100] = {0};
-    // while(1) {
-    //     if (serial.readline(buf, 100)){
-    //         int speed = 0;
-    //         sscanf(buf, "%d", &speed);
-    //         myservo = speed/100.0;
-    //     }
-    // }
+
+void logAllBNOData() {
+    bno055_vector_t acc = bno.getAccelerometer();
+    bno055_vector_t gyr = bno.getGyroscope();
+    bno055_vector_t mag = bno.getMagnetometer();
+    bno055_vector_t eul = bno.getEuler();
+    bno055_vector_t lin = bno.getLinearAccel();
+    bno055_vector_t grav = bno.getGravity();
+    bno055_vector_t quat = bno.getQuaternion();
+    float temp = bno.getTemperature();
+
+    double values[23] = {
+        acc.x, acc.y, acc.z,
+        gyr.x, gyr.y, gyr.z,
+        mag.x, mag.y, mag.z,
+        eul.x, eul.y, eul.z,
+        lin.x, lin.y, lin.z,    
+        grav.x, grav.y, grav.z,
+        quat.w, quat.x, quat.y, quat.z,
+        temp
+    };
+
+    for (int i = 0; i < 23; i++) {
+        flash.writeNum(writeAddr, values[i]);
+        writeAddr += 4;
+    }
+
+    serial.printf("Logged sample (92 bytes)\n");
+    serial.printf("%f\n", acc.x);
 }
-// void logAllBNOData() {
-//     bno055_vector_t acc = bno.getAccelerometer();
-//     bno055_vector_t gyr = bno.getGyroscope();
-//     bno055_vector_t mag = bno.getMagnetometer();
-//     bno055_vector_t eul = bno.getEuler();
-//     bno055_vector_t lin = bno.getLinearAccel();
-//     bno055_vector_t grav = bno.getGravity();
-//     bno055_vector_t quat = bno.getQuaternion();
-//     float temp = bno.getTemperature();
-
-//     double values[23] = {
-//         acc.x, acc.y, acc.z,
-//         gyr.x, gyr.y, gyr.z,
-//         mag.x, mag.y, mag.z,
-//         eul.x, eul.y, eul.z,
-//         lin.x, lin.y, lin.z,    
-//         grav.x, grav.y, grav.z,
-//         quat.w, quat.x, quat.y, quat.z,
-//         temp
-//     };
-
-//     for (int i = 0; i < 23; i++) {
-//         flash.writeNum(writeAddr, values[i]);
-//         writeAddr += 4;
-//     }
-
-//     printf("Logged sample (92 bytes)\n");
-//     printf("%f\n", acc.x);
-// }
 
 // void readAllBNOData(uint32_t entryCount) {
 //     uint32_t addr = FLASH_START_ADDR;
@@ -126,33 +84,22 @@ void motor(){
 //     }
 // }
 
+// Sample main to log data
 int main()
-{
+{   
+    flash.reset();
+    flash.eraseSector(FLASH_START_ADDR); // Start clean
+
+    bno.setup();
+    thread_sleep_for(1000); // Let sensor boot and settle
+
+    logTicker.attach(&logAllBNOData, 0.5); // Log every 0.5 seconds
+
+    // Run indefinitely
     while (1) {
-        // gyr = bno.getGyroscope();
-        // serial.printf("%f", gyr.x);
-        // ThisThread::sleep_for(500ms);
-        serial.printf("Scanning\n");
-        scanI2C();
-        ThisThread::sleep_for(500ms);
+        thread_sleep_for(1000);
     }
 }
-// Sample main to log data
-// int main()
-// {   
-//     flash.reset();
-//     flash.eraseSector(FLASH_START_ADDR); // Start clean
-
-//     imu.setup();
-//     thread_sleep_for(1000); // Let sensor boot and settle
-
-//     logTicker.attach(&logAllBNOData, 0.5s); // Log every 0.5 seconds
-
-//     // Run indefinitely
-//     while (1) {
-//         thread_sleep_for(1000);
-//     }
-// }
 
 // Sample main to read back data
 // int main()
