@@ -1,9 +1,14 @@
 {
+    "config": {
+        "main_stack_size": {
+            "value": 12288
+        }
+    },
     "target_overrides": {
         "*": {
             "target.printf_lib" : "std"
         },
-        "ARES": {
+        "ARES_BOOT": {
             "target.mbed_app_start": "0x08010000",
             "target.mbed_rom_start": "0x08000000",
             "target.mbed_rom_size" : "0x40000"
