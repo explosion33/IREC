@@ -11604,7 +11604,7 @@
 		)
 		(uuid "ddfbf61f-20b9-40ad-8676-0a9cedacb040")
 	)
-	(label "VCC"
+	(label "+3.3V"
 		(at 128.778 197.358 180)
 		(fields_autoplaced yes)
 		(effects
@@ -17030,7 +17030,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "680uF"
+		(property "Value" "470uF"
 			(at 222.504 162.56 0)
 			(effects
 				(font
@@ -19372,7 +19372,7 @@
 				)
 			)
 		)
-		(property "Value" "100uH"
+		(property "Value" "150uH"
 			(at 218.44 167.386 90)
 			(effects
 				(font
@@ -20237,7 +20237,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "150uF"
+		(property "Value" "100uF"
 			(at 167.894 165.862 0)
 			(effects
 				(font
@@ -22137,7 +22137,7 @@
 				(hide yes)
 			)
 		)
-		(property "JLCPCB#" "C32949"
+		(property "LCSC Part" "C1525"
 			(at 69.342 99.06 0)
 			(effects
 				(font
