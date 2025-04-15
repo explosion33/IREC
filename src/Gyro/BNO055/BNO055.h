@@ -1,6 +1,5 @@
-/*
-* Contains definitions of the BNO055 class and related enums and structs
-*/
+#ifndef BNO055_H
+#define BNO055_H
 
 #include <cstdint> // For std::uint16_t
 #include "mbed.h"
@@ -117,7 +116,7 @@ public:
     uint16_t getMagRadius();
     uint16_t getAccRadius();
 
-//private:
+private:
     I2C* i2c;
     bool owned;
     char addr;
@@ -146,3 +145,5 @@ public:
     int writeData(char regaddr, char data, uint8_t len);
     void setPWR(PWRMode mode);
 };
+
+#endif // BNO055_H

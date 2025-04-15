@@ -1,9 +1,3 @@
-/* 
-* BNO055 Constants
-* Contains macros for all register addresses
-*/
-
-
 #include <cstdint> // For std::uint16_t
 
 #define START_BYTE 0xAA
