@@ -11455,6 +11455,16 @@
 		)
 		(uuid bda009fa-03e7-4a1b-b5a0-2eb8e44d34d3)
 	)
+	(text "Part numbers done\n"
+		(exclude_from_sim no)
+		(at 204.978 262.636 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "0ce55cd9-d7ce-4fa1-956a-edbefb0e1086")
+	)
 	(text "VDDA Filtering"
 		(exclude_from_sim no)
 		(at 110.998 34.29 0)
@@ -11507,6 +11517,16 @@
 			)
 		)
 		(uuid "5eaaa7f3-ad19-426b-a608-e3855f2152b3")
+	)
+	(text "Part numbers done"
+		(exclude_from_sim no)
+		(at 214.63 17.526 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "694169c0-50a1-466c-909b-2982f1bebcb0")
 	)
 	(text "Motor\n"
 		(exclude_from_sim no)
@@ -11592,6 +11612,16 @@
 			(justify left bottom)
 		)
 		(uuid "a9f8c91a-c621-4cf6-a1da-af90eb57b1d6")
+	)
+	(text "Part numbers done\n"
+		(exclude_from_sim no)
+		(at 345.694 237.236 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "ccf154dc-7d81-4629-858e-2e5a3493b1cb")
 	)
 	(text "POWER"
 		(exclude_from_sim no)
@@ -21411,7 +21441,7 @@
 		(fields_autoplaced yes)
 		(uuid "c3a87683-8d30-4486-9501-54f28ed6d13c")
 		(property "Reference" "Y2"
-			(at 365.7854 200.3333 90)
+			(at 367.03 199.8979 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -21419,8 +21449,8 @@
 				(justify right)
 			)
 		)
-		(property "Value" "32.768Mhz"
-			(at 365.7854 202.8702 90)
+		(property "Value" "32.768Khz"
+			(at 367.03 202.4379 90)
 			(effects
 				(font
 					(size 1.27 1.27)

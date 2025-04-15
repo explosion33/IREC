@@ -710,7 +710,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C273598"
+		(property "LCSC Part" "C273598"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -898,7 +898,7 @@
 		(descr "Capacitor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C4"
-			(at -1.3 0 180)
+			(at -1.3 0 0)
 			(layer "F.SilkS")
 			(uuid "6beb29a5-b0e8-4594-a4d1-fcbfcde73f01")
 			(effects
@@ -958,7 +958,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C19702"
+		(property "LCSC Part" "C19702"
 			(at 0 0 -90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -1254,7 +1254,7 @@
 		)
 		(fp_arc
 			(start -0.7 1)
-			(mid -1.194976 0.794975)
+			(mid -1.194977 0.794976)
 			(end -1.400001 0.3)
 			(stroke
 				(width 0.12)
@@ -1680,7 +1680,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C307331"
+		(property "LCSC Part" "C307331"
 			(at 0 0 -90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -1906,7 +1906,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C307331"
+		(property "LCSC Part" "C307331"
 			(at 0 0 67.5)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -2358,7 +2358,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C12530"
+		(property "LCSC Part" "C12530"
 			(at 0 0 -90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -2584,7 +2584,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C52923"
+		(property "LCSC Part" "C52923"
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -4400,11 +4400,11 @@
 	(footprint "Resistor_SMD:R_0402_1005Metric"
 		(layer "F.Cu")
 		(uuid "30b35cb2-51e3-439e-be63-51d894604ae5")
-		(at 170.865509 67.462574 157.5)
+		(at 170.865509 67.462574 -112.5)
 		(descr "Resistor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R5"
-			(at 0 0.799997 157.5)
+			(at 0 0.799997 67.5)
 			(layer "F.SilkS")
 			(uuid "4bd6fb7c-1478-45ae-a3c4-97c897db8a24")
 			(effects
@@ -4415,7 +4415,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 0 1.169998 157.5)
+			(at 0 1.169998 67.5)
 			(layer "F.Fab")
 			(uuid "1b237bcb-af13-4086-add4-9a94e41492fc")
 			(effects
@@ -4426,7 +4426,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
-			(at 0 0 157.5)
+			(at 0 0 -112.5)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -4439,7 +4439,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 157.5)
+			(at 0 0 -112.5)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -4452,7 +4452,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 157.5)
+			(at 0 0 -112.5)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -4464,8 +4464,8 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C60490"
-			(at 0 0 157.5)
+		(property "LCSC Part" "C60490"
+			(at 0 0 -112.5)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
@@ -4483,16 +4483,6 @@
 		(sheetfile "RCS_Hardware.kicad_sch")
 		(attr smd)
 		(fp_line
-			(start -0.15364 -0.38)
-			(end 0.153644 -0.379999)
-			(stroke
-				(width 0.12)
-				(type solid)
-			)
-			(layer "F.SilkS")
-			(uuid "a16af509-82ff-4cba-aa06-25880d6b336d")
-		)
-		(fp_line
 			(start -0.153644 0.379999)
 			(end 0.15364 0.38)
 			(stroke
@@ -4503,14 +4493,14 @@
 			(uuid "a4e073fb-5eba-49f1-8c2a-65d5b5df5887")
 		)
 		(fp_line
-			(start 0.93 -0.470001)
-			(end 0.930001 0.470002)
+			(start -0.15364 -0.38)
+			(end 0.153644 -0.379999)
 			(stroke
-				(width 0.05)
+				(width 0.12)
 				(type solid)
 			)
-			(layer "F.CrtYd")
-			(uuid "efe378e9-88b9-45a2-ab17-258d4a30e796")
+			(layer "F.SilkS")
+			(uuid "a16af509-82ff-4cba-aa06-25880d6b336d")
 		)
 		(fp_line
 			(start 0.930001 0.470002)
@@ -4523,16 +4513,6 @@
 			(uuid "81fb7276-2590-4ab4-a7a5-1aa7695d7caa")
 		)
 		(fp_line
-			(start -0.930001 -0.470002)
-			(end 0.93 -0.470001)
-			(stroke
-				(width 0.05)
-				(type solid)
-			)
-			(layer "F.CrtYd")
-			(uuid "dd0a5e91-f498-4aa8-a51c-3587f047aeed")
-		)
-		(fp_line
 			(start -0.93 0.470001)
 			(end -0.930001 -0.470002)
 			(stroke
@@ -4543,14 +4523,24 @@
 			(uuid "774013c6-450a-49d3-8514-b024a458b82a")
 		)
 		(fp_line
-			(start 0.525001 -0.270001)
-			(end 0.525 0.27)
+			(start 0.93 -0.470001)
+			(end 0.930001 0.470002)
 			(stroke
-				(width 0.1)
+				(width 0.05)
 				(type solid)
 			)
-			(layer "F.Fab")
-			(uuid "f0000221-b642-48c8-bb43-670ceb7945d5")
+			(layer "F.CrtYd")
+			(uuid "efe378e9-88b9-45a2-ab17-258d4a30e796")
+		)
+		(fp_line
+			(start -0.930001 -0.470002)
+			(end 0.93 -0.470001)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "dd0a5e91-f498-4aa8-a51c-3587f047aeed")
 		)
 		(fp_line
 			(start 0.525 0.27)
@@ -4563,16 +4553,6 @@
 			(uuid "7c109e6b-b251-4ac9-944a-ccaef373530e")
 		)
 		(fp_line
-			(start -0.525 -0.27)
-			(end 0.525001 -0.270001)
-			(stroke
-				(width 0.1)
-				(type solid)
-			)
-			(layer "F.Fab")
-			(uuid "6595b05b-8873-4eb5-8e8d-739eb8c82214")
-		)
-		(fp_line
 			(start -0.525001 0.270001)
 			(end -0.525 -0.27)
 			(stroke
@@ -4582,8 +4562,28 @@
 			(layer "F.Fab")
 			(uuid "19469fb4-df87-4984-9a60-081ccbdd8ecf")
 		)
+		(fp_line
+			(start 0.525001 -0.270001)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "f0000221-b642-48c8-bb43-670ceb7945d5")
+		)
+		(fp_line
+			(start -0.525 -0.27)
+			(end 0.525001 -0.270001)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "6595b05b-8873-4eb5-8e8d-739eb8c82214")
+		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 157.5)
+			(at 0 0 67.5)
 			(layer "F.Fab")
 			(uuid "28faf101-8f7a-4252-8eaa-a729ca9bfddd")
 			(effects
@@ -4594,7 +4594,7 @@
 			)
 		)
 		(pad "1" smd roundrect
-			(at -0.509999 0 157.5)
+			(at -0.509999 0 247.5)
 			(size 0.54 0.64)
 			(layers "F.Cu" "F.Paste" "F.Mask")
 			(roundrect_rratio 0.25)
@@ -4603,7 +4603,7 @@
 			(uuid "3c7af73c-b28a-409c-9afe-90a6e99c3a73")
 		)
 		(pad "2" smd roundrect
-			(at 0.509999 0 157.5)
+			(at 0.509999 0 247.5)
 			(size 0.54 0.64)
 			(layers "F.Cu" "F.Paste" "F.Mask")
 			(roundrect_rratio 0.25)
@@ -4640,7 +4640,7 @@
 				)
 			)
 		)
-		(property "Value" "32.768Mhz"
+		(property "Value" "32.768Khz"
 			(at 0.000003 1.999999 157.5)
 			(layer "F.Fab")
 			(uuid "a36adc2f-346d-46b8-9686-d31ef4226726")
@@ -4690,7 +4690,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C907540"
+		(property "LCSC Part" "C32346"
 			(at 0 0 157.5)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -4916,7 +4916,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C60490"
+		(property "LCSC Part" "C60490"
 			(at 0 0 -112.5)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -5632,7 +5632,7 @@
 		(descr "SMD Crystal SERIES SMD3225/4 http://www.txccrystal.com/images/pdf/7m-accuracy.pdf, 3.2x2.5mm^2 package")
 		(tags "SMD SMT crystal")
 		(property "Reference" "Y1"
-			(at -3.2 2.2 180)
+			(at -3.2 2.2 0)
 			(layer "F.SilkS")
 			(uuid "fefd3c2f-f6fd-4230-895c-c3a3993ed5f4")
 			(effects
@@ -5692,7 +5692,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C13738"
+		(property "LCSC Part" "C13738"
 			(at 0 0 -90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -7008,7 +7008,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C307331"
+		(property "LCSC Part" "C307331"
 			(at 0 0 -56.25)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -7234,7 +7234,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C11702"
+		(property "LCSC Part" "C11702"
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -8136,7 +8136,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C32949"
+		(property "LCSC Part" "C32949"
 			(at 0 0 0)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -8645,7 +8645,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C466226"
+		(property "LCSC Part" "C466226"
 			(at 0 0 67.5)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -9364,7 +9364,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C25906"
+		(property "LCSC Part" "C25906"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -9817,7 +9817,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C11702"
+		(property "LCSC Part" "C11702"
 			(at 0 0 0)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -10043,7 +10043,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C60490"
+		(property "LCSC Part" "C60490"
 			(at 0 0 -22.5)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -11645,7 +11645,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C5674"
+		(property "LCSC Part" "C5674"
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -12151,7 +12151,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C32949"
+		(property "LCSC Part" "C32949"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -12377,6 +12377,19 @@
 				)
 			)
 		)
+		(property "LCSC Part" ""
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d3173677-6d79-4a2f-95bb-73b7de80247e")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(property ki_fp_filters "Connector*:*")
 		(path "/955eb0b1-e291-48f4-b2da-7fac017592a6")
 		(sheetname "Root")
@@ -12552,7 +12565,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C82344"
+		(property "LCSC Part" "C82344"
 			(at 0 0 33.75)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -14352,6 +14365,19 @@
 				)
 			)
 		)
+		(property "LCSC Part" "C99269"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1ebaa8e9-b19f-4d40-9854-6980bcf27af2")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(property ki_fp_filters "SOT?563*")
 		(path "/557d25ae-910d-437a-8e71-e46bac52c49b")
 		(sheetname "Root")
@@ -15705,6 +15731,19 @@
 				)
 			)
 		)
+		(property "LCSC Part" "C1525"
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "359ef701-2d3f-452f-9842-45a0cf11e56b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(property ki_fp_filters "C_*")
 		(path "/86f0f27a-f622-41b3-887f-389618bf56de")
 		(sheetname "Root")
@@ -16248,7 +16287,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C307331"
+		(property "LCSC Part" "C307331"
 			(at 0 0 157.5)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -16474,7 +16513,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C25906"
+		(property "LCSC Part" "C25906"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -16810,7 +16849,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C466226"
+		(property "LCSC Part" "C466226"
 			(at 0 0 67.5)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -17360,7 +17399,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C85831"
+		(property "LCSC Part" "C85831"
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -17869,7 +17908,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C15195"
+		(property "LCSC Part" "C15195"
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -18035,7 +18074,7 @@
 		(descr "Capacitor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C11"
-			(at -1.3 0.2 180)
+			(at -1.3 0.2 0)
 			(layer "F.SilkS")
 			(uuid "2b93dfee-55fe-4c24-851a-f2f544bd26e0")
 			(effects
@@ -18095,7 +18134,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C52923"
+		(property "LCSC Part" "C52923"
 			(at 0 0 -90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -18818,7 +18857,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C307331"
+		(property "LCSC Part" "C307331"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -19044,7 +19083,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C273598"
+		(property "LCSC Part" "C2286"
 			(at 0 0 -90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -19232,7 +19271,7 @@
 		(descr "Capacitor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C8"
-			(at -1.3 0 180)
+			(at -1.3 0 0)
 			(layer "F.SilkS")
 			(uuid "f90e6686-3916-4daf-a2ca-ee4d06cc7087")
 			(effects
@@ -19292,7 +19331,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C307331"
+		(property "LCSC Part" "C307331"
 			(at 0 0 -90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -19807,7 +19846,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C5674"
+		(property "LCSC Part" "C5674"
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -20033,7 +20072,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C60490"
+		(property "LCSC Part" "C60490"
 			(at 0 0 -56.25)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -20540,7 +20579,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C11702"
+		(property "LCSC Part" "C11702"
 			(at 0 0 -90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -20766,7 +20805,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C307331"
+		(property "LCSC Part" "C307331"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -21205,7 +21244,7 @@
 				)
 			)
 		)
-		(property "JLCPCB#" "C273598"
+		(property "LCSC Part" "C273598"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
