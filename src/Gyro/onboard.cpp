@@ -1,6 +1,6 @@
 #include "onboard.h"
 uint32_t writeAddr = FLASH_START_ADDR;
-void logAllBNOData(BNO055 *bno, flash *flash, USBSerial *serial) {
+void logAllBNOData(BNO055 *bno, flash *flash, EUSBSerial *serial) {
     bno055_vector_t acc = bno->getAccelerometer();
     bno055_vector_t gyr = bno->getGyroscope();
     bno055_vector_t mag = bno->getMagnetometer();
@@ -22,7 +22,7 @@ void logAllBNOData(BNO055 *bno, flash *flash, USBSerial *serial) {
     };
 
     for (int i = 0; i < 23; i++) {
-        flash->writeNum(writeAddr, values[i]);
+        flash->writeNum(writeAddr, values[i]); // this is writing as a float = 4 bytes
         writeAddr += 4;
     }
 
@@ -30,7 +30,7 @@ void logAllBNOData(BNO055 *bno, flash *flash, USBSerial *serial) {
     serial->printf("%f\n", acc.x);
 }
 
-void readAllBNOData(flash *flash, USBSerial *serial, uint32_t entryCount) {
+void readAllBNOData(flash *flash, EUSBSerial *serial, uint32_t entryCount) {
     uint32_t addr = FLASH_START_ADDR;
 
     for (uint32_t i = 0; i < entryCount; i++) {

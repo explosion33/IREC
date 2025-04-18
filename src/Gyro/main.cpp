@@ -7,13 +7,13 @@
 #include "AS5601.h"
 #include "flash.h"
 #include "onboard.h"
-#include "USBSerial.h"
+#include "USBSerial.h"  
 
 DigitalOut led (PC_13); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
-//EUSBSerial serial(0x3232, 0x1);
-USBSerial serial;
-I2C i2c(PB_7, PB_6); 
+EUSBSerial serial(0x3232, 0x1);
+//USBSerial serial;
+I2C i2c(PB_7, PB_8); 
 int ack; 
 int address;  
 void scanI2C() {
@@ -25,7 +25,7 @@ void scanI2C() {
     wait(50);
   } 
 } 
-BNO055 bno (PB_7, PB_6, 0x28 << 1);
+BNO055 bno (PB_7, PB_8, 0x28 << 1);
 //tmp102 tmp(PB_7, PB_6, 0x91);
 //Servo myservo(PA_15); // motor pwm pin
 flash f (PA_7, PA_6, PA_5, PA_4);
