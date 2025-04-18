@@ -30,6 +30,7 @@ BNO055 bno (PB_7, PB_8, 0x28 << 1);
 //Servo myservo(PA_15); // motor pwm pin
 flash f (PA_7, PA_6, PA_5, PA_4);
 
+// TODO: FIX ACCELEROMETER
 
 int main() {
     bno.setup();
