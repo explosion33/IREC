@@ -4,15 +4,15 @@
 #include "EUSBSerial.h"
 #include "motor.h"
 #include "tmp102.h"
-#include "AS5601.h"
 #include "flash.h"
 #include "onboard.h"
+#include "encoder.h"
 #include "USBSerial.h"  
 
 DigitalOut led (PC_13); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
-EUSBSerial serial(0x3232, 0x1);
-//USBSerial serial;
+//EUSBSerial serial(0x3232, 0x1);
+USBSerial serial;
 I2C i2c(PB_7, PB_8); 
 int ack; 
 int address;  
@@ -29,14 +29,19 @@ BNO055 bno (PB_7, PB_8, 0x28 << 1);
 //tmp102 tmp(PB_7, PB_6, 0x91);
 //Servo myservo(PA_15); // motor pwm pin
 flash f (PA_7, PA_6, PA_5, PA_4);
-
-// TODO: FIX ACCELEROMETER
+encoder e (PA_8, PA_9, 4096);
 
 int main() {
-    bno.setup();
-    f.eraseSector(FLASH_START_ADDR);
+    // bno.setup();
+    // f.eraseSector(FLASH_START_ADDR);
 
-    logAllBNOData(&bno, &f, &serial);
+    // logAllBNOData(&bno, &f, &serial);
 
-    readAllBNOData(&f, &serial, 1);
+    // readAllBNOData(&f, &serial, 1);
+    float count;
+    while(1){
+        count = e.getRevolutions();
+        serial.printf("%f\n",  count);
+        ThisThread::sleep_for(50);
+    }
 }

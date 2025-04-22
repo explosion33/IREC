@@ -39,9 +39,9 @@ encoder::encoder(PinName channelA, PinName channelB, int pulsesPerRev)
  * Returns the current encoder count.
  */
 int encoder::getCount() const {
-    _mutex.lock();
+    //_mutex.lock();
     int count = _position;
-    _mutex.unlock();
+    //_mutex.unlock();
     return count;
 }
 
@@ -109,9 +109,10 @@ void encoder::encodeISR() {
     uint8_t index = (_prevState << 2) | newState;
     int8_t step = _transitionTable[index];
 
-    _mutex.lock();
+    //_mutex.lock();
+
     _position += step;
     _direction = (step > 0) ? 1 : (step < 0 ? -1 : 0);
     _prevState = newState;
-    _mutex.unlock();
+    //_mutex.unlock();
 }

@@ -68,10 +68,10 @@ private:
      */
     void encodeISR();
 
-private:
     InterruptIn _chanA;         ///< Encoder input channel A
     InterruptIn _chanB;         ///< Encoder input channel B
 
+    
     volatile int _position;     ///< Current encoder position (pulse count)
     const int _pulsesPerRev;    ///< Pulses per full revolution
     volatile uint8_t _prevState;///< Previous 2-bit state of (A, B)
