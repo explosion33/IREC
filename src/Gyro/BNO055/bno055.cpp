@@ -690,3 +690,90 @@ bno055_vector_t BNO055::getGravity() {
 bno055_vector_t BNO055::getQuaternion() {
     return bno055_getVector(BNO055_VECTOR_QUATERNION);  
 }
+
+
+/**
+ * @brief Generic function to read a raw vector stored as int16
+ * @param vec One of the BNO055_VECTOR_* constants
+ * @return A struct containing the x, y, z, (and w if quaternion) data.
+ */
+bno055_raw_vector_t BNO055::bno055_getRawVector(char vec) {
+    setPage(0);
+
+    char buffer[8] = {0};
+    if (vec == BNO055_VECTOR_QUATERNION) {
+        readData(vec, buffer, 8);
+    } else {
+        readData(vec, buffer, 6);
+    }
+
+    bno055_raw_vector_t raw{};
+    raw.w = 0;
+
+    if (vec == BNO055_VECTOR_QUATERNION) {
+        raw.w = static_cast<int16_t>((buffer[1] << 8) | buffer[0]);
+        raw.x = static_cast<int16_t>((buffer[3] << 8) | buffer[2]);
+        raw.y = static_cast<int16_t>((buffer[5] << 8) | buffer[4]);
+        raw.z = static_cast<int16_t>((buffer[7] << 8) | buffer[6]);
+    } else {
+        raw.x = static_cast<int16_t>((buffer[1] << 8) | buffer[0]);
+        raw.y = static_cast<int16_t>((buffer[3] << 8) | buffer[2]);
+        raw.z = static_cast<int16_t>((buffer[5] << 8) | buffer[4]);
+    }
+
+    return raw;
+}
+
+bno055_raw_vector_t BNO055::getRawAccelerometer() {
+    return bno055_getRawVector(BNO055_VECTOR_ACCELEROMETER);
+}
+
+bno055_raw_vector_t BNO055::getRawMagnetometer() {
+    return bno055_getRawVector(BNO055_VECTOR_MAGNETOMETER);
+}
+
+bno055_raw_vector_t BNO055::getRawGyroscope() {
+    return bno055_getRawVector(BNO055_VECTOR_GYROSCOPE);
+}
+
+bno055_raw_vector_t BNO055::getRawEuler() {
+    return bno055_getRawVector(BNO055_VECTOR_EULER);
+}
+
+bno055_raw_vector_t BNO055::getRawLinearAccel() {
+    return bno055_getRawVector(BNO055_VECTOR_LINEARACCEL);
+}
+
+bno055_raw_vector_t BNO055::getRawGravity() {
+    return bno055_getRawVector(BNO055_VECTOR_GRAVITY);
+}
+
+bno055_raw_vector_t BNO055::getRawQuaternion() {
+    return bno055_getRawVector(BNO055_VECTOR_QUATERNION);
+}
+
+bno055_vector_t BNO055::convertRaw(bno055_raw_vector_t raw, char vec) {
+    double scale = 1.0;
+
+    if (vec == BNO055_VECTOR_MAGNETOMETER) {
+        scale = magScale;
+    } else if (vec == BNO055_VECTOR_ACCELEROMETER ||
+               vec == BNO055_VECTOR_LINEARACCEL  ||
+               vec == BNO055_VECTOR_GRAVITY) {
+        scale = accelScale;
+    } else if (vec == BNO055_VECTOR_GYROSCOPE) {
+        scale = angularRateScale;
+    } else if (vec == BNO055_VECTOR_EULER) {
+        scale = eulerScale;
+    } else if (vec == BNO055_VECTOR_QUATERNION) {
+        scale = quaScale;
+    }
+
+    bno055_vector_t vecOut;
+    vecOut.x = raw.x / scale;
+    vecOut.y = raw.y / scale;
+    vecOut.z = raw.z / scale;
+    vecOut.w = (vec == BNO055_VECTOR_QUATERNION) ? (raw.w / scale) : 0.0;
+
+    return vecOut;
+}

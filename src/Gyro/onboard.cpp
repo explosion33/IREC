@@ -10,7 +10,7 @@ void logAllBNOData(BNO055 *bno, flash *flash, EUSBSerial *serial) {
     bno055_vector_t quat = bno->getQuaternion();
     float temp = bno->getTemperature();
 
-    double values[23] = {
+    double values[23] = { // we can write the raw bit values to save space
         acc.x, acc.y, acc.z,
         gyr.x, gyr.y, gyr.z,
         mag.x, mag.y, mag.z,

@@ -8,7 +8,10 @@
 #include "EUSBSerial.h"
 #include "USBSerial.h"
 
-// Forward declare or include your actual flash class
+struct data_packet{
+
+};
+
 
 #define FLASH_START_ADDR     0x000000
 #define FLASH_TOTAL_SIZE     0x200000   // 2 MB = 16 Mbit

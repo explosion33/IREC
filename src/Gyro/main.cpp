@@ -42,6 +42,6 @@ int main() {
     while(1){
         count = e.getRevolutions();
         serial.printf("%f\n",  count);
-        ThisThread::sleep_for(50);
+        ThisThread::sleep_for(50ms);
     }
 }

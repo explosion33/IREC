@@ -42,6 +42,13 @@ struct bno055_vector_t {
     double z;
 };
 
+struct  bno055_raw_vector_t{
+    int16_t w;
+    int16_t x;
+    int16_t y;
+    int16_t z;
+};
+
 struct offset {
     uint16_t offsetX;
     uint16_t offsetY;
@@ -108,6 +115,17 @@ public:
     bno055_vector_t getGravity();
     bno055_vector_t getQuaternion();
     float getTemperature();
+
+    bno055_raw_vector_t bno055_getRawVector(char vec);
+    bno055_raw_vector_t getRawAccelerometer();
+    bno055_raw_vector_t getRawMagnetometer();
+    bno055_raw_vector_t getRawGyroscope();
+    bno055_raw_vector_t getRawEuler();
+    bno055_raw_vector_t getRawLinearAccel();
+    bno055_raw_vector_t getRawGravity();
+    bno055_raw_vector_t getRawQuaternion();
+
+    bno055_vector_t convertRaw(bno055_raw_vector_t raw, char vec);
 
     // Calibration 
     offset getGyrOffset();
