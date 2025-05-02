@@ -120,6 +120,17 @@ void flash::eraseSector(uint32_t address) {
     wait_us(500000); // Erase time delay (~500 ms)
 }
 
+void flash::eraseAll() {
+    enableWrite();
+    
+    uint8_t cmd = 0xC7; 
+
+    csLow();
+    _spi.write((const char *)&cmd, 1, NULL, 0);
+    csHigh();
+
+    wait_us(100000000);
+}
 /**
  * Sends Write Enable command to allow write/erase operations.
  */

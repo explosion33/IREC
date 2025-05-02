@@ -35,12 +35,12 @@ enum bno055_vector_type_t {
   BNO055_VECTOR_GRAVITY = 0x2E         // Default: m/s²
 };
 
-struct bno055_vector_t {
-    double w;
-    double x;
-    double y;
-    double z;
-};
+typedef struct {
+    float w;
+    float x;
+    float y;
+    float z;
+} bno055_vector_t;
 
 struct  bno055_raw_vector_t{
     int16_t w;

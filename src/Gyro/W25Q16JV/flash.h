@@ -20,6 +20,8 @@ public:
 
     // Erase operations
     void eraseSector(uint32_t address);
+    void eraseAll();
+    
 
     // Control operations
     void enableWrite();

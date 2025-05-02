@@ -13,35 +13,125 @@ DigitalOut led (PC_13); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
 //EUSBSerial serial(0x3232, 0x1);
 USBSerial serial;
-I2C i2c(PB_7, PB_8); 
-int ack; 
-int address;  
-void scanI2C() {
-  for(address=0;address<255;address++) {    
-    ack = i2c.write(address, "11", 1);
-    if (ack == 0) {
-       serial.printf("\tFound at %3d -- %3x\r\n", address,address);
-    }    
-    wait(50);
-  } 
-} 
-BNO055 bno (PB_7, PB_8, 0x28 << 1);
-//tmp102 tmp(PB_7, PB_6, 0x91);
+
+// Sensors
+BNO055 bno (PB_7, PB_8, 0x50);
+tmp102 tmp(PB_7, PB_6, 0x91);
 //Servo myservo(PA_15); // motor pwm pin
 flash f (PA_7, PA_6, PA_5, PA_4);
-encoder e (PA_8, PA_9, 4096);
+encoder e1 (PA_8, PA_9, 4096);
 
-int main() {
-    // bno.setup();
-    // f.eraseSector(FLASH_START_ADDR);
+// Threads
+Thread thread1;
+Thread thread2;
+Mutex logMutex;
 
-    // logAllBNOData(&bno, &f, &serial);
+struct EncoderData{
+    float encoder1_pos;
+    float encoder2_pos;
+};
 
-    // readAllBNOData(&f, &serial, 1);
-    float count;
-    while(1){
-        count = e.getRevolutions();
-        serial.printf("%f\n",  count);
-        ThisThread::sleep_for(50ms);
+struct BNO055Data{
+    bno055_vector_t acc;
+    bno055_vector_t gyr;
+    bno055_vector_t mag;
+    bno055_vector_t eul;
+    bno055_vector_t lin;
+    bno055_vector_t grav;
+    bno055_vector_t quat;
+};
+
+struct TMPData{
+    float temp;
+};
+
+struct LogData {
+    EncoderData encoder;
+    BNO055Data bno055;
+    TMPData tmp;
+};
+
+LogData logdata;
+
+
+void sensor_thread() {
+    bno.setup();
+    while (true) {
+        bno055_vector_t acc = bno.getAccelerometer();
+        bno055_vector_t gyr = bno.getGyroscope();
+        bno055_vector_t mag = bno.getMagnetometer();
+        bno055_vector_t eul = bno.getEuler();
+        bno055_vector_t lin = bno.getLinearAccel();
+        bno055_vector_t grav = bno.getGravity();
+        bno055_vector_t quat = bno.getQuaternion();
+        
+        float temp = tmp.getTempCelsius();
+
+        logMutex.lock();
+        logdata.tmp.temp = temp;
+        logdata.bno055.acc = acc;
+        logdata.bno055.gyr = gyr;
+        logdata.bno055.mag = mag;
+        logdata.bno055.eul = eul;
+        logdata.bno055.lin = lin;
+        logdata.bno055.grav = grav;
+        logdata.bno055.quat = quat;
+        logMutex.unlock();
+
+        ThisThread::sleep_for(10ms);
     }
+}
+
+void encoder_thread(){
+    while (1) {
+        float pos1 = e1.getOrientationDegrees();
+        float pos2 = e2.getOrientationDegrees();
+
+        logMutex.lock();
+        logdata.encoder.encoder1_pos = pos1;
+        logdata.encoder.encoder2_pos = pos2;
+        logMutex.unlock();
+
+        ThisThread::sleep_for(10ms);
+    }
+}
+
+void log() {
+    while (1) {
+        LogData snapshot;
+
+        logMutex.lock();
+        snapshot = logdata;
+        logMutex.unlock();
+        
+        // flash logging
+
+        printf("Enc1: %.2f Enc2: %.2f | "
+                "ACC [w: %.2f x: %.2f y: %.2f z: %.2f] "
+                "GYR [w: %.2f x: %.2f y: %.2f z: %.2f] "
+                "MAG [w: %.2f x: %.2f y: %.2f z: %.2f] "
+                "EUL [w: %.2f x: %.2f y: %.2f z: %.2f] "
+                "LIN [w: %.2f x: %.2f y: %.2f z: %.2f] "
+                "GRAV [w: %.2f x: %.2f y: %.2f z: %.2f] "
+                "QUAT [w: %.2f x: %.2f y: %.2f z: %.2f] "
+                "TEMP: %.2f\n",
+                snapshot.encoder.encoder1_pos, snapshot.encoder.encoder2_pos,
+                snapshot.bno055.acc.w, snapshot.bno055.acc.x, snapshot.bno055.acc.y, snapshot.bno055.acc.z,
+                snapshot.bno055.gyr.w, snapshot.bno055.gyr.x, snapshot.bno055.gyr.y, snapshot.bno055.gyr.z,
+                snapshot.bno055.mag.w, snapshot.bno055.mag.x, snapshot.bno055.mag.y, snapshot.bno055.mag.z,
+                snapshot.bno055.eul.w, snapshot.bno055.eul.x, snapshot.bno055.eul.y, snapshot.bno055.eul.z,
+                snapshot.bno055.lin.w, snapshot.bno055.lin.x, snapshot.bno055.lin.y, snapshot.bno055.lin.z,
+                snapshot.bno055.grav.w, snapshot.bno055.grav.x, snapshot.bno055.grav.y, snapshot.bno055.grav.z,
+                snapshot.bno055.quat.w, snapshot.bno055.quat.x, snapshot.bno055.quat.y, snapshot.bno055.quat.z,
+                snapshot.tmp.temp);
+        ThisThread::sleep_for(100ms);
+    }
+
+}
+int main() {
+    thread1.start(sensor_thread);
+    thread2.start(encoder_thread);
+
+    log();
+
 }
