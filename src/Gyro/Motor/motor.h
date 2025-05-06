@@ -15,10 +15,8 @@ public:
      * @brief Construct a new Motor object.
      * 
      * @param pin The PWM pin connected to the servo motor.
-     * @param center The normalized center position (default 0.5).
-     * @param range The effective range from center to full forward/backward (default 0.5).
      */
-    Motor(PinName pin, float center = 0.5f, float range = 0.5f);
+    Motor(PinName pin);
 
     /**
      * @brief Set motor power/speed.
@@ -48,8 +46,6 @@ public:
 
 private:
     Servo _servo;
-    float _center;
-    float _range;
     float _speed;
 };
 

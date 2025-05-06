@@ -14,16 +14,19 @@ DigitalOut rst(PA_5); // RST pin for the BNO055
 //EUSBSerial serial(0x3232, 0x1);
 USBSerial serial;
 
+// TODO: get full flight code written and tested
 // Sensors
 BNO055 bno (PB_7, PB_8, 0x50);
 tmp102 tmp(PB_7, PB_6, 0x91);
-//Servo myservo(PA_15); // motor pwm pin
+Motor mymotor(PA_15); // motor pwm pin
 flash f (PA_7, PA_6, PA_5, PA_4);
 encoder e1 (PA_8, PA_9, 4096);
+encoder e2 (PA_8, PA_9, 4096);
 
 // Threads
 Thread thread1;
 Thread thread2;
+Thread thread3;
 Mutex logMutex;
 
 struct EncoderData{
@@ -41,6 +44,10 @@ struct BNO055Data{
     bno055_vector_t quat;
 };
 
+struct MotorData{
+    float speed;
+};
+
 struct TMPData{
     float temp;
 };
@@ -52,7 +59,15 @@ struct LogData {
 };
 
 LogData logdata;
-
+void motor_thread() {
+    mymotor.arm();
+    while (true) {
+        for (float i = 0.00; i < 1.0; i += 0.025) {
+            mymotor.setSpeed(i);
+            ThisThread::sleep_for(100ms);
+        }
+    }
+}
 
 void sensor_thread() {
     bno.setup();
@@ -131,7 +146,7 @@ void log() {
 int main() {
     thread1.start(sensor_thread);
     thread2.start(encoder_thread);
-
+    thread3.start(motor_thread);
     log();
 
 }
