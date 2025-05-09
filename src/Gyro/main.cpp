@@ -16,17 +16,29 @@ USBSerial serial;
 
 // TODO: get full flight code written and tested
 // Sensors
-BNO055 bno (PB_7, PB_8, 0x50);
-tmp102 tmp(PB_7, PB_6, 0x91);
+BNO055 bno (PB_7, PB_6, 0x50);
+//tmp102 tmp(PB_7, PB_6, 0x91);
 Motor mymotor(PA_15); // motor pwm pin
-flash f (PA_7, PA_6, PA_5, PA_4);
+// flash f (PA_7, PA_6, PA_5, PA_4);
 encoder e1 (PA_8, PA_9, 4096);
-encoder e2 (PA_8, PA_9, 4096);
+// encoder e2 (PA_8, PA_9, 4096);
 
-// Threads
+// int ack; 
+// I2C i2c(PB_7, PB_6); 
+// int address;  
+// void scanI2C() {
+//   for(address=0;address<255;address++) {    
+//     ack = i2c.write(address, "11", 1);
+//     if (ack == 0) {
+//        serial.printf("\tFound at %3d -- %3x\r\n", address,address);
+//     }    
+//     wait(50);
+//   } 
+// } 
 Thread thread1;
 Thread thread2;
 Thread thread3;
+Thread thread4;
 Mutex logMutex;
 
 struct EncoderData{
@@ -59,18 +71,12 @@ struct LogData {
 };
 
 LogData logdata;
+
 void motor_thread() {
-    mymotor.arm();
-    while (true) {
-        for (float i = 0.00; i < 1.0; i += 0.025) {
-            mymotor.setSpeed(i);
-            ThisThread::sleep_for(100ms);
-        }
-    }
+    mymotor.setSpeed(1);
 }
 
 void sensor_thread() {
-    bno.setup();
     while (true) {
         bno055_vector_t acc = bno.getAccelerometer();
         bno055_vector_t gyr = bno.getGyroscope();
@@ -80,10 +86,10 @@ void sensor_thread() {
         bno055_vector_t grav = bno.getGravity();
         bno055_vector_t quat = bno.getQuaternion();
         
-        float temp = tmp.getTempCelsius();
+        //float temp = tmp.getTempCelsius();
 
         logMutex.lock();
-        logdata.tmp.temp = temp;
+        //logdata.tmp.temp = temp;
         logdata.bno055.acc = acc;
         logdata.bno055.gyr = gyr;
         logdata.bno055.mag = mag;
@@ -100,18 +106,18 @@ void sensor_thread() {
 void encoder_thread(){
     while (1) {
         float pos1 = e1.getOrientationDegrees();
-        float pos2 = e2.getOrientationDegrees();
+        //float pos2 = e2.getOrientationDegrees();
 
         logMutex.lock();
         logdata.encoder.encoder1_pos = pos1;
-        logdata.encoder.encoder2_pos = pos2;
+        //logdata.encoder.encoder2_pos = pos2;
         logMutex.unlock();
 
         ThisThread::sleep_for(10ms);
     }
 }
 
-void log() {
+void log_thread() {
     while (1) {
         LogData snapshot;
 
@@ -121,7 +127,7 @@ void log() {
         
         // flash logging
 
-        printf("Enc1: %.2f Enc2: %.2f | "
+        serial.printf("Enc1: %.2f Enc2: %.2f | "
                 "ACC [w: %.2f x: %.2f y: %.2f z: %.2f] "
                 "GYR [w: %.2f x: %.2f y: %.2f z: %.2f] "
                 "MAG [w: %.2f x: %.2f y: %.2f z: %.2f] "
@@ -143,10 +149,47 @@ void log() {
     }
 
 }
+
+void print_vector(const bno055_vector_t& v) {
+    serial.printf("%.2f %.2f %.2f ", v.x, v.y, v.z);
+}
+
+DigitalIn ir (PB_1);
+volatile int curr_count = 0;
+Ticker t;
+int last_state = 0;
+
+void check_sensor() {
+    int current_state = ir.read();
+    if (last_state == 0 && current_state == 1) {
+        // Rising edge detected (object passing)
+        curr_count++;
+    }
+    last_state = current_state;
+}
+
 int main() {
-    thread1.start(sensor_thread);
-    thread2.start(encoder_thread);
-    thread3.start(motor_thread);
-    log();
+    bno.setup();
+    mymotor.arm();
+    //thread1.start(sensor_thread);
+    // thread2.start(encoder_thread);
+    // thread3.start(motor_thread);
+    // thread4.start(log_thread);
+    mymotor.setSpeed(0.5);
+    t.attach(&check_sensor, 1ms);
+
+    while (true) {
+
+        ThisThread::sleep_for(500ms);
+
+        int rpm = curr_count * 120;
+
+        serial.printf("RPM: %d\n", rpm);
+
+        curr_count = 0;
+    }
+    
+    
+    
 
 }

@@ -1,3 +1,3 @@
 void wait(int time_ms);
 
-void scanI2C();
+// void scanI2C();
