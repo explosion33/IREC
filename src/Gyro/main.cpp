@@ -9,12 +9,16 @@
 #include "encoder.h"
 #include "USBSerial.h"  
 
+
+// System Parameters
+#define WATCHDOG_TIMEOUT_MS 5000
+#define MOTOR_SPEED 1
+
 DigitalOut led (PC_13); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
 //EUSBSerial serial(0x3232, 0x1);
 USBSerial serial;
 
-// TODO: get full flight code written and tested
 // Sensors
 BNO055 bno (PB_7, PB_6, 0x50);
 //tmp102 tmp(PB_7, PB_6, 0x91);
@@ -23,18 +27,20 @@ Motor mymotor(PA_15); // motor pwm pin
 encoder e1 (PA_8, PA_9, 4096);
 // encoder e2 (PA_8, PA_9, 4096);
 
-// int ack; 
-// I2C i2c(PB_7, PB_6); 
-// int address;  
-// void scanI2C() {
-//   for(address=0;address<255;address++) {    
-//     ack = i2c.write(address, "11", 1);
-//     if (ack == 0) {
-//        serial.printf("\tFound at %3d -- %3x\r\n", address,address);
-//     }    
-//     wait(50);
-//   } 
-// } 
+// TODO: figure out operating frequencies to get system fully functional with no errors
+
+// watchdog stuff
+Watchdog &watchdog = Watchdog::get_instance();
+void watchdog_thread() {
+    watchdog.start(WATCHDOG_TIMEOUT_MS);
+    while (true) {
+        watchdog.kick();
+        ThisThread::sleep_for(1000ms);
+    }
+}
+
+
+
 Thread thread1;
 Thread thread2;
 Thread thread3;
@@ -73,7 +79,7 @@ struct LogData {
 LogData logdata;
 
 void motor_thread() {
-    mymotor.setSpeed(1);
+    mymotor.setSpeed(MOTOR_SPEED);
 }
 
 void sensor_thread() {
@@ -188,8 +194,4 @@ int main() {
 
         curr_count = 0;
     }
-    
-    
-    
-
 }
