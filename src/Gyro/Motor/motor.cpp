@@ -14,10 +14,10 @@ void Motor::arm() {
     wait(500);
 
     _servo.write(1.0f);                     // Maximum throttle
-    wait(8000);
+    wait(5000);
 
     _servo.write(0.0f);                     // Back to minimum
-    wait(8000);
+    wait(5000);
 }
 
 /**

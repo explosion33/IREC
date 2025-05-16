@@ -1,5 +1,4 @@
 #include "encoder.h"
-#include "platform/PlatformMutex.h"
 #include "platform/CriticalSectionLock.h"
 
 // Lookup table for transitions between encoder states

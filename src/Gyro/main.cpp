@@ -8,11 +8,15 @@
 #include "onboard.h"
 #include "encoder.h"
 #include "USBSerial.h"  
+#include <chrono>
 
 
 // System Parameters
 #define WATCHDOG_TIMEOUT_MS 5000
 #define MOTOR_SPEED 1
+#define SENSOR_INTERVAL chrono::milliseconds(10)
+#define ENCODER_INTERVAL chrono::milliseconds(10)
+#define LOG_INTERVAL chrono::milliseconds(50)
 
 DigitalOut led (PC_13); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
@@ -26,8 +30,6 @@ Motor mymotor(PA_15); // motor pwm pin
 // flash f (PA_7, PA_6, PA_5, PA_4);
 encoder e1 (PA_8, PA_9, 4096);
 // encoder e2 (PA_8, PA_9, 4096);
-
-// TODO: figure out operating frequencies to get system fully functional with no errors
 
 // watchdog stuff
 Watchdog &watchdog = Watchdog::get_instance();
@@ -50,6 +52,7 @@ Mutex logMutex;
 struct EncoderData{
     float encoder1_pos;
     float encoder2_pos;
+    uint64_t timestamp;
 };
 
 struct BNO055Data{
@@ -60,6 +63,7 @@ struct BNO055Data{
     bno055_vector_t lin;
     bno055_vector_t grav;
     bno055_vector_t quat;
+    uint64_t timestamp;
 };
 
 struct MotorData{
@@ -83,6 +87,7 @@ void motor_thread() {
 }
 
 void sensor_thread() {
+    bno.setup();
     while (true) {
         bno055_vector_t acc = bno.getAccelerometer();
         bno055_vector_t gyr = bno.getGyroscope();
@@ -93,6 +98,7 @@ void sensor_thread() {
         bno055_vector_t quat = bno.getQuaternion();
         
         //float temp = tmp.getTempCelsius();
+        uint64_t timestamp_us = Kernel::Clock::now().time_since_epoch().count();
 
         logMutex.lock();
         //logdata.tmp.temp = temp;
@@ -103,55 +109,77 @@ void sensor_thread() {
         logdata.bno055.lin = lin;
         logdata.bno055.grav = grav;
         logdata.bno055.quat = quat;
+        logdata.bno055.timestamp = timestamp_us;
         logMutex.unlock();
 
-        ThisThread::sleep_for(10ms);
+        ThisThread::sleep_for(SENSOR_INTERVAL);
     }
 }
 
-void encoder_thread(){
-    while (1) {
+void encoder_thread(chrono::milliseconds interval = 10ms){
+    while (true) {
         float pos1 = e1.getOrientationDegrees();
         //float pos2 = e2.getOrientationDegrees();
+        uint64_t timestamp_us = Kernel::Clock::now().time_since_epoch().count();
 
         logMutex.lock();
         logdata.encoder.encoder1_pos = pos1;
         //logdata.encoder.encoder2_pos = pos2;
+        logdata.encoder.timestamp = timestamp_us;
         logMutex.unlock();
 
-        ThisThread::sleep_for(10ms);
+        ThisThread::sleep_for(ENCODER_INTERVAL);
     }
 }
 
 void log_thread() {
-    while (1) {
+    LogData last_snapshot = {};
+    while (true) {
         LogData snapshot;
 
         logMutex.lock();
         snapshot = logdata;
         logMutex.unlock();
         
+
+        bool encoder_ready = snapshot.encoder.timestamp != last_snapshot.encoder.timestamp;
+        bool sensor_ready = snapshot.bno055.timestamp != last_snapshot.bno055.timestamp;
         // flash logging
 
-        serial.printf("Enc1: %.2f Enc2: %.2f | "
-                "ACC [w: %.2f x: %.2f y: %.2f z: %.2f] "
-                "GYR [w: %.2f x: %.2f y: %.2f z: %.2f] "
-                "MAG [w: %.2f x: %.2f y: %.2f z: %.2f] "
-                "EUL [w: %.2f x: %.2f y: %.2f z: %.2f] "
-                "LIN [w: %.2f x: %.2f y: %.2f z: %.2f] "
-                "GRAV [w: %.2f x: %.2f y: %.2f z: %.2f] "
-                "QUAT [w: %.2f x: %.2f y: %.2f z: %.2f] "
-                "TEMP: %.2f\n",
-                snapshot.encoder.encoder1_pos, snapshot.encoder.encoder2_pos,
-                snapshot.bno055.acc.w, snapshot.bno055.acc.x, snapshot.bno055.acc.y, snapshot.bno055.acc.z,
-                snapshot.bno055.gyr.w, snapshot.bno055.gyr.x, snapshot.bno055.gyr.y, snapshot.bno055.gyr.z,
-                snapshot.bno055.mag.w, snapshot.bno055.mag.x, snapshot.bno055.mag.y, snapshot.bno055.mag.z,
-                snapshot.bno055.eul.w, snapshot.bno055.eul.x, snapshot.bno055.eul.y, snapshot.bno055.eul.z,
-                snapshot.bno055.lin.w, snapshot.bno055.lin.x, snapshot.bno055.lin.y, snapshot.bno055.lin.z,
-                snapshot.bno055.grav.w, snapshot.bno055.grav.x, snapshot.bno055.grav.y, snapshot.bno055.grav.z,
-                snapshot.bno055.quat.w, snapshot.bno055.quat.x, snapshot.bno055.quat.y, snapshot.bno055.quat.z,
-                snapshot.tmp.temp);
-        ThisThread::sleep_for(100ms);
+        // Print statements for debugging
+        if (encoder_ready || sensor_ready) {
+            if (encoder_ready) {
+                serial.printf(
+                    "[%llu us] ENC1: %.2f ENC2: %.2f\n",
+                    snapshot.encoder.timestamp,
+                    snapshot.encoder.encoder1_pos,
+                    snapshot.encoder.encoder2_pos
+                );
+            }
+
+            if (sensor_ready) {
+                serial.printf("[%llu us] IMU:\n", snapshot.bno055.timestamp);
+                serial.printf("  ACC  [x: %.2f, y: %.2f, z: %.2f]\n",
+                    snapshot.bno055.acc.x, snapshot.bno055.acc.y, snapshot.bno055.acc.z);
+                serial.printf("  GYR  [x: %.2f, y: %.2f, z: %.2f]\n",
+                    snapshot.bno055.gyr.x, snapshot.bno055.gyr.y, snapshot.bno055.gyr.z);
+                serial.printf("  MAG  [x: %.2f, y: %.2f, z: %.2f]\n",
+                    snapshot.bno055.mag.x, snapshot.bno055.mag.y, snapshot.bno055.mag.z);
+                serial.printf("  EUL  [x: %.2f, y: %.2f, z: %.2f]\n",
+                    snapshot.bno055.eul.x, snapshot.bno055.eul.y, snapshot.bno055.eul.z);
+                serial.printf("  LIN  [x: %.2f, y: %.2f, z: %.2f]\n",
+                    snapshot.bno055.lin.x, snapshot.bno055.lin.y, snapshot.bno055.lin.z);
+                serial.printf("  GRAV [x: %.2f, y: %.2f, z: %.2f]\n",
+                    snapshot.bno055.grav.x, snapshot.bno055.grav.y, snapshot.bno055.grav.z);
+                serial.printf("  QUAT [w: %.2f, x: %.2f, y: %.2f, z: %.2f]\n",
+                    snapshot.bno055.quat.w, snapshot.bno055.quat.x,
+                    snapshot.bno055.quat.y, snapshot.bno055.quat.z);
+            }
+
+            last_snapshot = snapshot;
+        }
+
+        ThisThread::sleep_for(LOG_INTERVAL);
     }
 
 }
@@ -160,6 +188,8 @@ void print_vector(const bno055_vector_t& v) {
     serial.printf("%.2f %.2f %.2f ", v.x, v.y, v.z);
 }
 
+
+// IR Sensor Stuff
 DigitalIn ir (PB_1);
 volatile int curr_count = 0;
 Ticker t;
@@ -174,24 +204,33 @@ void check_sensor() {
     last_state = current_state;
 }
 
+void start() {
+    // set sensors into low power states
+    bno.writeData(BNO055_POWER_MODE, 0x02, 1); // suspend mode
+    tmp.writeData() // set to SD
+
+}
+
+void wait_sequence() {
+    while (true) {
+        // wait and process serial message
+        // put bno in suspend mode
+        
+    }
+}
+
+void setup() {
+    // power on sensors
+    // set settings
+    // arm esc
+}
 int main() {
-    bno.setup();
-    mymotor.arm();
-    //thread1.start(sensor_thread);
+    // place sensors in low power mode
+    // wait for start command
+    // wake up
+    // mymotor.arm();
+    thread1.start(sensor_thread);
     // thread2.start(encoder_thread);
     // thread3.start(motor_thread);
-    // thread4.start(log_thread);
-    mymotor.setSpeed(0.5);
-    t.attach(&check_sensor, 1ms);
-
-    while (true) {
-
-        ThisThread::sleep_for(500ms);
-
-        int rpm = curr_count * 120;
-
-        serial.printf("RPM: %d\n", rpm);
-
-        curr_count = 0;
-    }
+    thread4.start(log_thread);
 }
