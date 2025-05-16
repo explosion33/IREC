@@ -13,23 +13,23 @@
 
 // System Parameters
 #define WATCHDOG_TIMEOUT_MS 5000
-#define MOTOR_SPEED 1
+#define MOTOR_SPEED 0.5
 #define SENSOR_INTERVAL chrono::milliseconds(10)
 #define ENCODER_INTERVAL chrono::milliseconds(10)
 #define LOG_INTERVAL chrono::milliseconds(50)
 
 DigitalOut led (PC_13); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
-//EUSBSerial serial(0x3232, 0x1);
-USBSerial serial;
+EUSBSerial serial(0x3232, 0x1);
+//USBSerial serial;
 
 // Sensors
 BNO055 bno (PB_7, PB_6, 0x50);
-//tmp102 tmp(PB_7, PB_6, 0x91);
+tmp102 tmp(PB_7, PB_6, 0x91);
 Motor mymotor(PA_15); // motor pwm pin
 // flash f (PA_7, PA_6, PA_5, PA_4);
 encoder e1 (PA_8, PA_9, 4096);
-// encoder e2 (PA_8, PA_9, 4096);
+//encoder e2 (PA_8, PA_9, 1024);
 
 // TODO: figure out operating frequencies to get system fully functional with no errors
 /* 
@@ -92,6 +92,12 @@ struct LogData {
     TMPData tmp;
 };
 
+enum class State {
+    Idle,
+    Setup,
+    Main
+};
+
 LogData logdata;
 
 void motor_thread() {
@@ -128,7 +134,7 @@ void sensor_thread() {
     }
 }
 
-void encoder_thread(chrono::milliseconds interval = 10ms){
+void encoder_thread(){
     while (true) {
         float pos1 = e1.getOrientationDegrees();
         //float pos2 = e2.getOrientationDegrees();
@@ -218,31 +224,57 @@ void check_sensor() {
 
 void start() {
     // set sensors into low power states
-    bno.writeData(BNO055_POWER_MODE, 0x02, 1); // suspend mode
-    tmp.writeData() // set to SD
+    bno.start(); // suspend mode
+    //tmp.start(); // SD mode
 
-}
-
-void wait_sequence() {
-    while (true) {
-        // wait and process serial message
-        // put bno in suspend mode
-        
-    }
 }
 
 void setup() {
     // power on sensors
     // set settings
     // arm esc
+    mymotor.arm();
 }
+
+// void wait_sequence() {
+//     State fsm_state = State::Idle;
+//     char cmd_buffer[32];
+
+//     while (true) {
+//         switch(fsm_state) {
+//             case State::Idle:
+//                 if (serial.readline(cmd_buffer, sizeof(cmd_buffer))) {
+//                     if (strcmp(cmd_buffer, "Start command") == 0) {
+//                         fsm_state = State::Setup;
+//                     }
+//                 }
+
+//                 ThisThread::sleep_for(10ms);
+//                 break;
+            
+//             case State::Setup:  
+//                 setup();
+//                 fsm_state = State::Main;
+//                 break;
+
+//             case State::Main:
+//                 return;
+//         }
+        
+//     }
+// }
+
+
 int main() {
-    // place sensors in low power mode
-    // wait for start command
-    // wake up
-    // mymotor.arm();
-    thread1.start(sensor_thread);
+    // start();
+    // wait_sequence();
+    mymotor.arm();
+    mymotor.setSpeed(0.5);
+    while(true) {
+        serial.printf("Hello World");
+    }
+    //thread1.start(sensor_thread);
     // thread2.start(encoder_thread);
     // thread3.start(motor_thread);
-    thread4.start(log_thread);
+    // thread4.start(log_thread);
 }

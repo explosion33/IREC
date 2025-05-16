@@ -555,6 +555,11 @@ BNO055Result BNO055::readSelfTest() {
     }
 }
 
+
+BNO055Result BNO055::start() {
+    setPWR(PWRMode::Suspend);
+    return BNO055Result::Ok;
+}
 /**
  * @brief Basic setup function for the BNO055:
  *        - Resets the device

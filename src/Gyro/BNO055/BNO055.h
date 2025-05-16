@@ -102,6 +102,7 @@ public:
     BNO055Result readSelfTest();
 
     // Lifecycle
+    BNO055Result start();
     BNO055Result setup();
     BNO055Result stop();
 
