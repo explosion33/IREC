@@ -31,6 +31,18 @@ Motor mymotor(PA_15); // motor pwm pin
 encoder e1 (PA_8, PA_9, 4096);
 // encoder e2 (PA_8, PA_9, 4096);
 
+// TODO: figure out operating frequencies to get system fully functional with no errors
+/* 
+Maximums: 
+Acc - 100Hz
+Mag - 20Hz
+Gyro - 100Hz
+Fusion Data - 100Hz
+TMP - 8Hz
+*/
+
+// TODO: Need to overwrite defaults to run sensors faster
+
 // watchdog stuff
 Watchdog &watchdog = Watchdog::get_instance();
 void watchdog_thread() {
