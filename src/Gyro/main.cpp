@@ -18,13 +18,13 @@
 #define ENCODER_INTERVAL chrono::milliseconds(10)
 #define LOG_INTERVAL chrono::milliseconds(50)
 
-DigitalOut led (PC_13); // Onboard LED
+DigitalOut led (PA_10); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
 EUSBSerial serial(0x3232, 0x1);
 //USBSerial serial;
 
 // Sensors
-BNO055 bno (PB_7, PB_6, 0x50);
+BNO055 bno (PB_7, PB_8, 0x50);
 tmp102 tmp(PB_7, PB_6, 0x91);
 Motor mymotor(PA_15); // motor pwm pin
 // flash f (PA_7, PA_6, PA_5, PA_4);
@@ -264,17 +264,31 @@ void setup() {
 //     }
 // }
 
+I2C i2c (PB_4, PA_8);
+int ack;   
+int address;  
+void scanI2C() {
+  for(address=1;address<127;address++) {    
+    ack = i2c.write(address, "11", 1);
+    if (ack == 0) {
+       serial.printf("\tFound at %3d -- %3x\r\n", address,address);
+    }    
+    wait(0.05);
+  } 
+}
 
 int main() {
     // start();
     // wait_sequence();
-    mymotor.arm();
-    mymotor.setSpeed(0.5);
-    while(true) {
-        serial.printf("Hello World");
-    }
+    // mymotor.arm();
+    // mymotor.setSpeed(0.5);
     //thread1.start(sensor_thread);
     // thread2.start(encoder_thread);
     // thread3.start(motor_thread);
-    // thread4.start(log_thread);
+    //thread4.start(log_thread);
+
+    while (true) {
+        serial.printf("Scanning");
+        scanI2C();
+    }
 }
