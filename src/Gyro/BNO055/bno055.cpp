@@ -160,9 +160,9 @@ void BNO055::setOPMode(char mode) {
     // According to Bosch datasheet, wait times vary after setting OPR_MODE:
     // 19ms if switching to CONFIG mode, 7ms otherwise.
     if (mode == BNO055_OPERATION_MODE_CONFIG) {
-        wait(19);
+        ThisThread::sleep_for(19ms);
     } else {
-        wait(7);
+        ThisThread::sleep_for(7ms);
     }
 }
 
@@ -176,7 +176,7 @@ void BNO055::setACC(char GRange, char Bandwidth, char OPMode) {
     setPage(0);
     char config = GRange | Bandwidth | OPMode;
     writeData(BNO055_ACC_CONFIG, config, 1);
-    wait(20);
+    ThisThread::sleep_for(20ms);
 }
 
 /**
@@ -190,9 +190,9 @@ void BNO055::setGYR(char Range, char Bandwidth, char OPMode) {
     char config0 = Range | Bandwidth;
     char config1 = OPMode;
     writeData(BNO055_GYRO_CONFIG_0, config0, 1);
-    wait(20);
+    ThisThread::sleep_for(20ms);
     writeData(BNO055_GYRO_CONFIG_1, config1, 1);
-    wait(20);
+    ThisThread::sleep_for(20ms);
 }
 
 /**
@@ -205,7 +205,7 @@ void BNO055::setMAG(char Rate, char OPMode, char Power) {
     setPage(0);
     char config = Rate | OPMode | Power;
     writeData(BNO055_MAG_CONFIG, config, 1);
-    wait(20);
+    ThisThread::sleep_for(20ms);
 }
 
 /**
@@ -228,7 +228,7 @@ void BNO055::setCLK(bool external) {
     readData(BNO055_SYS_TRIGGER, &tmp, 1);
     tmp |= external ? 0x80 : 0x00;
     writeData(BNO055_SYS_TRIGGER, tmp, 1);
-    wait(700);
+    ThisThread::sleep_for(700ms);
 }
 
 /**
@@ -248,7 +248,7 @@ void BNO055::setUnit(bool acc, bool angular, bool euler, bool temp, bool fusion)
     config |= (temp << 4);
     config |= (fusion << 7);
     writeData(BNO055_UNIT_SEL, config, 1);
-    wait(20);
+    ThisThread::sleep_for(20ms);
 }
 
 /**
@@ -258,7 +258,7 @@ void BNO055::setUnit(bool acc, bool angular, bool euler, bool temp, bool fusion)
 void BNO055::reset() {
     char resetVal = 0x20;
     writeData(BNO055_SYS_TRIGGER, resetVal, 1);
-    wait(700);
+    ThisThread::sleep_for(700ms);
 }
 
 /**
@@ -285,10 +285,10 @@ void BNO055::nReset() {
 void BNO055::setAxes(Axes newX, Axes newY, Axes newZ, bool xNeg, bool yNeg, bool zNeg) {
     char axes = getAxes(newX, newY, newZ);
     writeData(BNO055_AXIS_MAP_CONFIG, axes, 1);
-    wait(20);
+    ThisThread::sleep_for(20ms);
     char sign = getAxesSign(xNeg, yNeg, zNeg);
     writeData(BNO055_AXIS_MAP_SIGN, sign, 1);
-    wait(20);
+    ThisThread::sleep_for(20ms);
     // If sign inversion is desired, call setAxesSign(...) or integrate it here
 }
 
@@ -523,7 +523,7 @@ void BNO055::runSelfTest() {
     readData(BNO055_SYS_TRIGGER, &set, 1);
     set |= 0x01; // Set SELF_TEST bit
     writeData(BNO055_SYS_TRIGGER, set, 1);
-    wait(20);
+    ThisThread::sleep_for(20ms);
 }
 
 /**
@@ -556,7 +556,7 @@ BNO055Result BNO055::readSelfTest() {
 }
 
 
-BNO055Result BNO055::start() {
+BNO055Result BNO055::suspend() {
     setPWR(PWRMode::Suspend);
     return BNO055Result::Ok;
 }
@@ -569,6 +569,8 @@ BNO055Result BNO055::start() {
  */
 BNO055Result BNO055::setup() {
     reset();
+    setOPMode(BNO055_OPERATION_MODE_CONFIG);
+    setPWR(PWRMode::Normal);
     setPage(0);
     setOPMode(BNO055_OPERATION_MODE_NDOF);
     // Add any other configurations needed (units, axis remap, calibration, etc.)
@@ -576,14 +578,6 @@ BNO055Result BNO055::setup() {
     return BNO055Result::Ok;
 }
 
-/**
- * @brief Puts the sensor into the Suspend power mode.
- * @return BNO055Result::Ok if successful
- */
-BNO055Result BNO055::stop() {
-    setPWR(PWRMode::Suspend);
-    return BNO055Result::Ok;
-}
 
 /**
  * @brief Generic function to read a vector from the BNO055, such as

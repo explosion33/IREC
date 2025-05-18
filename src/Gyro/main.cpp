@@ -20,8 +20,8 @@
 
 DigitalOut led (PA_10); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
-//EUSBSerial serial(0x3232, 0x1);
-USBSerial serial;
+EUSBSerial serial(0x3232, 0x1);
+//USBSerial serial;
 
 // // Sensors
 BNO055 bno (PB_4, PA_8, 0x50);
@@ -203,67 +203,44 @@ void log_thread() {
 
 }
 
-void print_vector(const bno055_vector_t& v) {
-    serial.printf("%.2f %.2f %.2f ", v.x, v.y, v.z);
-}
-
-
-// IR Sensor Stuff
-DigitalIn ir (PB_1);
-volatile int curr_count = 0;
-Ticker t;
-int last_state = 0;
-
-void check_sensor() {
-    int current_state = ir.read();
-    if (last_state == 0 && current_state == 1) {
-        // Rising edge detected (object passing)
-        curr_count++;
-    }
-    last_state = current_state;
-}
-
-void start() {
-    // set sensors into low power states
-    bno.start(); // suspend mode
-    //tmp.start(); // SD mode
-
+void suspend() {
+    bno.suspend(); // suspend mode
+    tmp.shutDown(); // SD mode
 }
 
 void setup() {
-    // power on sensors
-    // set settings
-    // arm esc
     mymotor.arm();
+    bno.setup();
+    tmp.turnOn();
 }
 
-// void wait_sequence() {
-//     State fsm_state = State::Idle;
-//     char cmd_buffer[32];
+void wait_sequence() {
+    State fsm_state = State::Idle;
+    char cmd_buffer[32];
 
-//     while (true) {
-//         switch(fsm_state) {
-//             case State::Idle:
-//                 if (serial.readline(cmd_buffer, sizeof(cmd_buffer))) {
-//                     if (strcmp(cmd_buffer, "Start command") == 0) {
-//                         fsm_state = State::Setup;
-//                     }
-//                 }
+    while (true) {
+        switch(fsm_state) {
+            case State::Idle:
+                if (serial.readline(cmd_buffer, sizeof(cmd_buffer))) {
+                    if (strcmp(cmd_buffer, "Start") == 0) {
+                        fsm_state = State::Setup;
+                    }
+                }
 
-//                 ThisThread::sleep_for(10ms);
-//                 break;
+                ThisThread::sleep_for(10ms);
+                break;
             
-//             case State::Setup:  
-//                 setup();
-//                 fsm_state = State::Main;
-//                 break;
+            case State::Setup:  
+                setup();
+                fsm_state = State::Main;
+                break;
 
-//             case State::Main:
-//                 return;
-//         }
+            case State::Main:
+                return;
+        }
         
-//     }
-// }
+    }
+}
 I2C i2c(PB_4, PA_8);   
 int ack;   
 int address;  
@@ -273,16 +250,12 @@ void scanI2C() {
     if (ack == 0) {
         serial.printf("\tFound at %3d -- %3x\r\n", address,address);
     }
-    wait(0.05);
+    ThisThread::sleep_for(50ms);
   } 
 }
 int main() {
-
-    ack = i2c.write(80, "", 1);
     // start();
     // wait_sequence();
-    // mymotor.arm();
-    // mymotor.setSpeed(0.5);
     thread1.start(sensor_thread);
     // thread2.start(encoder_thread);
     // thread3.start(motor_thread);

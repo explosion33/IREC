@@ -102,9 +102,8 @@ public:
     BNO055Result readSelfTest();
 
     // Lifecycle
-    BNO055Result start();
+    BNO055Result suspend();
     BNO055Result setup();
-    BNO055Result stop();
 
     // Data retrieval
     bno055_vector_t bno055_getVector(char vec);

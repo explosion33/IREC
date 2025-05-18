@@ -73,6 +73,7 @@ public:
     // Resets the sensor
     void reset();
 
+
 //private:
     I2C* i2c;           // Pointer to I2C instance
     char addr;          // I2C address of the TMP102
