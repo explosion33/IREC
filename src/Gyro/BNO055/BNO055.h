@@ -134,7 +134,7 @@ public:
     uint16_t getMagRadius();
     uint16_t getAccRadius();
 
-private:
+//private:
     I2C* i2c;
     bool owned;
     char addr;
