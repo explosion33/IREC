@@ -35,6 +35,8 @@ private:
     // Helper functions for SPI communication
     void csLow();
     void csHigh();
+    
+    bool isDone(uint32_t timeout_ms);
 };
 
 // Float conversion functions

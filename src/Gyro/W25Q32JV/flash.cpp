@@ -38,6 +38,33 @@ void flash::csHigh() {
     _cs = 1;
 }
 
+bool flash::isDone(uint32_t timeout_ms) {
+    const uint8_t READ_STATUS = 0x05;
+    char tx_rx[2];
+    uint8_t status = 0;
+
+    uint32_t elapsed = 0;
+    const uint32_t sleep_step = 1;
+
+    while (elapsed < timeout_ms) {
+        tx_rx[0] = READ_STATUS;
+        tx_rx[1] = 0x00;
+
+        csLow();
+        _spi.write(tx_rx, 2, tx_rx, 2);
+        csHigh();
+
+        status = tx_rx[1];
+        if ((status & 0x01) == 0) {
+            return true;
+        }
+
+        ThisThread::sleep_for(sleep_step);
+        elapsed += sleep_step;
+    }
+
+    return false;
+}
 /**
  * Writes a buffer of data to a specific address in flash memory.
  * @param address - 24-bit target address
@@ -45,55 +72,31 @@ void flash::csHigh() {
  * @param length - Number of bytes to write
  */
 void flash::write(uint32_t address, const uint8_t *buffer, size_t length) {
-    // enableWrite(); // Required before any write
+    const size_t PAGE_SIZE = 256;
 
-    // uint8_t cmd[4];
-    // cmd[0] = 0x02; // Page Program command
-    // cmd[1] = (address >> 16) & 0xFF;
-    // cmd[2] = (address >> 8) & 0xFF;
-    // cmd[3] = address & 0xFF;
-
-    // csLow();
-    // _spi.write((const char *)cmd, 4, NULL, 0);
-    // _spi.write((const char *)buffer, length, NULL, 0);
-    // csHigh();
-
-    // wait_us(5000); // Allow time for write cycle
     while (length > 0) {
-        // Enable writing for each Page Program operation
         enableWrite();
 
-        // Calculate offset within the current page
-        uint32_t page_offset = address % 256;
-        uint32_t bytes_to_page_end = 256 - page_offset;
-
-        // Don't write past the current page
+        uint32_t page_offset = address % PAGE_SIZE;
+        uint32_t bytes_to_page_end = PAGE_SIZE - page_offset;
         size_t chunk = (length < bytes_to_page_end) ? length : bytes_to_page_end;
 
-        // Construct 0x02 Page Program command
-        uint8_t cmd[4];
-        cmd[0] = 0x02; // Page Program
-        cmd[1] = (address >> 16) & 0xFF;
-        cmd[2] = (address >> 8) & 0xFF;
-        cmd[3] = address & 0xFF;
+        uint8_t cmd[4] = {
+            0x02,
+            static_cast<uint8_t>((address >> 16) & 0xFF),
+            static_cast<uint8_t>((address >> 8) & 0xFF),
+            static_cast<uint8_t>(address & 0xFF)
+        };
 
         csLow();
-        _spi.write((const char*)cmd, 4, nullptr, 0);
-        _spi.write((const char*)buffer, chunk, nullptr, 0);
+        _spi.write((const char *)cmd, 4, nullptr, 0);
+        _spi.write((const char *)buffer, chunk, nullptr, 0);
         csHigh();
 
-        // Wait until flash reports it's done
-        uint8_t rd = 0x05;     // Read Status Register
-        uint8_t status = 0;
+        if (!isDone(100)) {
+            return;
+        }
 
-        do {
-            csLow();
-            _spi.write((const char*)&rd, 1, nullptr, 0);
-            _spi.write(nullptr, 0, (char*)&status, 1);
-            csHigh();
-        } while (status & 0x01); // WIP (write-in-progress) bit set
-
-        // Update pointers and counters
         address += chunk;
         buffer += chunk;
         length -= chunk;
@@ -156,20 +159,16 @@ void flash::eraseSector(uint32_t address) {
     _spi.write((const char *)cmd, 4, NULL, 0);
     csHigh();
 
-    wait_us(500000); // Erase time delay (~500 ms)
+    isDone(4000);
 }
 
 void flash::eraseAll() {
-    enableWrite();
-    
-    uint8_t cmd = 0xC7; 
-
-    csLow();
-    _spi.write((const char *)&cmd, 1, NULL, 0);
-    csHigh();
-
-    wait_us(100000000);
+    for (uint32_t addr = 0; addr < 0x400000; addr += 0x1000) {
+        eraseSector(addr);
+    }
 }
+
+
 /**
  * Sends Write Enable command to allow write/erase operations.
  */
@@ -178,7 +177,15 @@ void flash::enableWrite() {
     csLow();
     _spi.write((const char *)&cmd, 1, NULL, 0);
     csHigh();
-    wait_us(5000);
+    uint8_t status = 0;
+    do {
+        uint8_t readCmd = 0x05;
+        csLow();
+        _spi.write((const char *)&readCmd, 1, NULL, 0);
+        _spi.write(NULL, 0, (char *)&status, 1);
+        csHigh();
+        ThisThread::sleep_for(1ms);
+    } while (!(status & 0x02)); // Wait until WEL is set
 }
 
 /**
@@ -189,7 +196,15 @@ void flash::disableWrite() {
     csLow();
     _spi.write((const char *)&cmd, 1, NULL, 0);
     csHigh();
-    wait_us(5000);
+    uint8_t status = 0;
+    do {
+        uint8_t readCmd = 0x05;
+        csLow();
+        _spi.write((const char *)&readCmd, 1, NULL, 0);
+        _spi.write(NULL, 0, (char *)&status, 1);
+        csHigh();
+        ThisThread::sleep_for(1ms);
+    } while (status & 0x02); // Wait until WEL is cleared
 }
 
 /**

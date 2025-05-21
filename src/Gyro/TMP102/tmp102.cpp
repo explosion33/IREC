@@ -187,7 +187,7 @@ int16_t tmp102::oneShot(){
     readData(TMP102_CONFIG, config, 2);
     config[0] |= 0x80;
     writeData(TMP102_CONFIG, config, 2);
-    wait(10);
+    ThisThread::sleep_for(10ms);
     return getTemp();
 }
 

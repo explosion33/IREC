@@ -16,36 +16,26 @@
 // System Parameters
 #define WATCHDOG_TIMEOUT_MS 5000
 #define MOTOR_SPEED 0.5
-#define SENSOR_INTERVAL chrono::milliseconds(100)
+#define SENSOR_INTERVAL chrono::milliseconds(50)
 #define ENCODER_INTERVAL chrono::milliseconds(10)
 #define LOG_INTERVAL chrono::milliseconds(100)
 #define ENCODER_PPM 2048
+#define MAX_LOG_BYTES 0x10000
+#define ENTRY_SIZE 51
+#define FLASH_LOG_START_ADDR 0x0000
 
 DigitalOut led (PA_9); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
 EUSBSerial serial(0x3232, 0x1);
 //USBSerial serial;
 
-// // Sensors
-BNO055 bno (PB_7, PB_6, 0x50);
+// Sensors
+BNO055 bno (PB_4, PA_8, 0x50);
 tmp102 tmp(PB_4, PA_8, 0x91);
-Motor mymotor(PA_7); // motor pwm pin
 Servo myservo(PA_15);
 flash f (PA_7, PA_6, PA_5, PA_4);
 encoder e1 (PA_8, PA_9, 2048);
-//encoder e2 (PA_8, PA_9, 1024);
-
-// TODO: figure out operating frequencies to get system fully functional with no errors
-/* 
-Maximums: 
-Acc - 100Hz
-Mag - 20Hz
-Gyro - 100Hz
-Fusion Data - 100Hz
-TMP - 8Hz
-*/
-
-// TODO: Need to overwrite defaults to run sensors faster
+encoder e2 (PB_6, PB_7, 2048);
 
 // watchdog stuff
 Watchdog &watchdog = Watchdog::get_instance();
@@ -56,7 +46,6 @@ void watchdog_thread() {
         ThisThread::sleep_for(1000ms);
     }
 }
-
 
 
 Thread thread1;
@@ -97,9 +86,9 @@ struct LogData {
 };
 
 struct EncoderDataRaw {
-    int16_t encoder1_raw;   // e.g., ticks or scaled position
+    int16_t encoder1_raw;
     int16_t encoder2_raw;
-    uint32_t timestamp;     // compressed timestamp
+    uint32_t timestamp;
 };
 
 struct BNO055DataRaw {
@@ -114,11 +103,11 @@ struct BNO055DataRaw {
 };
 
 struct MotorDataRaw {
-    int16_t speed_raw;  // e.g., rpm × 10 or ×100
+    int16_t speed_raw;
 };
 
 struct TMPDataRaw {
-    int16_t temp_raw;   // degrees Celsius × 100
+    int16_t temp_raw;
 };
 
 struct LogDataRaw {
@@ -130,6 +119,7 @@ struct LogDataRaw {
 enum class State {
     Idle,
     Setup,
+    Reset,
     Main
 };
 
@@ -204,12 +194,12 @@ void sensor_thread_raw() {
 void encoder_thread(){
     while (true) {
         float pos1 = e1.getOrientationDegrees();
-        //float pos2 = e2.getOrientationDegrees();
+        float pos2 = e2.getOrientationDegrees();
         uint64_t timestamp_us = Kernel::Clock::now().time_since_epoch().count();
 
         logMutex.lock();
         logdata.encoder.encoder1_pos = pos1;
-        //logdata.encoder.encoder2_pos = pos2;
+        logdata.encoder.encoder2_pos = pos2;
         logdata.encoder.timestamp = timestamp_us;
         logMutex.unlock();
 
@@ -220,14 +210,14 @@ void encoder_thread(){
 void encoder_thread_raw(){
     while (true) {
         int16_t pos1 = static_cast<int16_t>(e1.getCount());
-        //int16_t pos2 = static_cast<int16_t>(e2.getCount());
+        int16_t pos2 = static_cast<int16_t>(e2.getCount());
         uint32_t timestamp_us = static_cast<uint32_t>(
             Kernel::Clock::now().time_since_epoch().count()
         );
 
         logMutex.lock();
         logdataraw.encoder.encoder1_raw = pos1;
-        //logdataraw.encoder.encoder2_raw = pos2;
+        logdataraw.encoder.encoder2_raw = pos2;
         logdataraw.encoder.timestamp = timestamp_us;
         logMutex.unlock();
 
@@ -248,7 +238,6 @@ void log_thread() {
         bool encoder_ready = snapshot.encoder.timestamp != last_snapshot.encoder.timestamp;
         bool sensor_ready = snapshot.bno055.timestamp != last_snapshot.bno055.timestamp;
 
-        // Print statemen ts for debugging
         if (encoder_ready || sensor_ready) {
             if (encoder_ready) {
                 serial.printf(
@@ -281,7 +270,6 @@ void log_thread() {
 
             last_snapshot = snapshot;
         }
-
         ThisThread::sleep_for(LOG_INTERVAL);
     }
 
@@ -291,7 +279,7 @@ void log_thread_raw() {
     LogDataRaw last_snapshot = {};
     uint32_t write_address = 0x000000;
 
-    while (true) {
+    while(true) {
         logMutex.lock();
         LogDataRaw snapshot = logdataraw;
         logMutex.unlock();
@@ -359,9 +347,9 @@ void decode(const uint8_t* buffer, size_t length) {
         float enc1_pos = static_cast<float>(enc1) / ENCODER_PPM;
         float enc2_pos = static_cast<float>(enc2) / ENCODER_PPM;
 
-        printf("[%u us] ENCODERS:\n", ts_enc);
-        printf("  ENC1: %.3f (raw %d)\n", enc1_pos, enc1);
-        printf("  ENC2: %.3f (raw %d)\n", enc2_pos, enc2);
+        serial.printf("[%u us] ENCODERS:\n", ts_enc);
+        serial.printf("  ENC1: %.3f (raw %d)\n", enc1_pos, enc1);
+        serial.printf("  ENC2: %.3f (raw %d)\n", enc2_pos, enc2);
     }
 
     if (flags & 0x02) {
@@ -374,7 +362,7 @@ void decode(const uint8_t* buffer, size_t length) {
             raw.z = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
 
             bno055_vector_t v = bno.convertRaw(raw, vec_id);
-            printf("  %s [x: %.3f, y: %.3f, z: %.3f]\n", label, v.x, v.y, v.z);
+            serial.printf("  %s [x: %.3f, y: %.3f, z: %.3f]\n", label, v.x, v.y, v.z);
         };
 
         auto read_quat = [&]() {
@@ -385,10 +373,10 @@ void decode(const uint8_t* buffer, size_t length) {
             raw.z = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
 
             bno055_vector_t v = bno.convertRaw(raw, BNO055_VECTOR_QUATERNION);
-            printf("  QUAT [w: %.4f, x: %.4f, y: %.4f, z: %.4f]\n", v.w, v.x, v.y, v.z);
+            serial.printf("  QUAT [w: %.4f, x: %.4f, y: %.4f, z: %.4f]\n", v.w, v.x, v.y, v.z);
         };
 
-        printf("[%u us] BNO055:\n", ts_imu);
+        serial.printf("[%u us] BNO055:\n", ts_imu);
         read_vec3("ACC ", BNO055_VECTOR_ACCELEROMETER);
         read_vec3("GYR ", BNO055_VECTOR_GYROSCOPE);
         read_vec3("MAG ", BNO055_VECTOR_MAGNETOMETER);
@@ -399,10 +387,83 @@ void decode(const uint8_t* buffer, size_t length) {
 
         int16_t temp_raw = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
         float temp_celsius = temp_raw * 0.0625f;
-        printf("  TEMP: %.2f °C (raw %d)\n", temp_celsius, temp_raw);
+        serial.printf("  TEMP: %.2f C\n", temp_celsius, temp_raw);
     }
 }
 
+void decodeCSV(const uint8_t* buffer, size_t length) {
+    const uint8_t* ptr = buffer;
+    uint8_t flags = *ptr++;
+
+    uint32_t ts_enc = 0, ts_imu = 0;
+    float enc1_pos = -999999.0f, enc2_pos = -999999.0f;
+    float acc[3] = {-999999.0f, -999999.0f, -999999.0f};
+    float gyr[3] = {-999999.0f, -999999.0f, -999999.0f};
+    float mag[3] = {-999999.0f, -999999.0f, -999999.0f};
+    float eul[3] = {-999999.0f, -999999.0f, -999999.0f};
+    float lin[3] = {-999999.0f, -999999.0f, -999999.0f};
+    float grav[3] = {-999999.0f, -999999.0f, -999999.0f};
+    float quat[4] = {-999999.0f, -999999.0f, -999999.0f, -999999.0f};
+    float temp_celsius = -999999.0f;
+
+    if (flags & 0x01) {
+        ts_enc = *reinterpret_cast<const uint32_t*>(ptr); ptr += 4;
+        int16_t enc1 = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
+        int16_t enc2 = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
+
+        enc1_pos = static_cast<float>(enc1) / ENCODER_PPM;
+        enc2_pos = static_cast<float>(enc2) / ENCODER_PPM;
+    }
+
+    if (flags & 0x02) {
+        ts_imu = *reinterpret_cast<const uint32_t*>(ptr); ptr += 4;
+
+        auto read_vec3 = [&](float* out, char vec_id) {
+            bno055_raw_vector_t raw{};
+            raw.x = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
+            raw.y = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
+            raw.z = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
+            bno055_vector_t v = bno.convertRaw(raw, vec_id);
+            out[0] = v.x;
+            out[1] = v.y;
+            out[2] = v.z;
+        };
+
+        auto read_quat = [&](float* out) {
+            bno055_raw_vector_t raw{};
+            raw.w = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
+            raw.x = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
+            raw.y = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
+            raw.z = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
+            bno055_vector_t v = bno.convertRaw(raw, BNO055_VECTOR_QUATERNION);
+            out[0] = v.w;
+            out[1] = v.x;
+            out[2] = v.y;
+            out[3] = v.z;
+        };
+
+        read_vec3(acc,  BNO055_VECTOR_ACCELEROMETER);
+        read_vec3(gyr,  BNO055_VECTOR_GYROSCOPE);
+        read_vec3(mag,  BNO055_VECTOR_MAGNETOMETER);
+        read_vec3(eul,  BNO055_VECTOR_EULER);
+        read_vec3(lin,  BNO055_VECTOR_LINEARACCEL);
+        read_vec3(grav, BNO055_VECTOR_GRAVITY);
+        read_quat(quat);
+
+        int16_t temp_raw = *reinterpret_cast<const int16_t*>(ptr); ptr += 2;
+        temp_celsius = temp_raw * 0.0625f;
+    }
+
+    serial.printf("%u,%.3f,%.3f,%u,", ts_enc, enc1_pos, enc2_pos, ts_imu);
+    for (int i = 0; i < 3; i++) serial.printf("%.3f,", acc[i]);
+    for (int i = 0; i < 3; i++) serial.printf("%.3f,", gyr[i]);
+    for (int i = 0; i < 3; i++) serial.printf("%.3f,", mag[i]);
+    for (int i = 0; i < 3; i++) serial.printf("%.3f,", eul[i]);
+    for (int i = 0; i < 3; i++) serial.printf("%.3f,", lin[i]);
+    for (int i = 0; i < 3; i++) serial.printf("%.3f,", grav[i]);
+    for (int i = 0; i < 4; i++) serial.printf("%.4f,", quat[i]);
+    serial.printf("%.2f\n", temp_celsius);
+}
 
 void suspend() {
     bno.suspend(); // suspend mode
@@ -412,7 +473,7 @@ void suspend() {
 void setup() {
     bno.setup();
     tmp.turnOn();
-    mymotor.arm();
+    //mymotor.arm();
 }
 
 void wait_sequence() {
@@ -426,12 +487,21 @@ void wait_sequence() {
                     if (strcmp(cmd_buffer, "start") == 0) {
                         fsm_state = State::Setup;
                         serial.printf("start received\n");
+                    } else if (strcmp(cmd_buffer, "erase") == 0) {
+                        fsm_state = State::Reset;
+                        serial.printf("erase\n");
                     }
                 }
 
                 ThisThread::sleep_for(10ms);
                 break;
-            
+
+            case State::Reset:
+                f.eraseAll();
+                fsm_state = State::Setup;
+                break;
+
+
             case State::Setup:  
                 setup();
                 fsm_state = State::Main;
@@ -443,85 +513,63 @@ void wait_sequence() {
         
     }
 }
+I2C i2c(PB_4, PA_8);  
 
-I2C i2c(PB_4, PA_8);
 int ack;   
 int address;  
 void scanI2C() {
-  for(address=1;address<127;address++) {    
+  for(address=1;address<255;address++) {    
     ack = i2c.write(address, "11", 1);
     if (ack == 0) {
-       serial.printf("\tFound at %3d -- %3x\r\n", address,address);
+        serial.printf("\tFound at %3d -- %3x\r\n", address,address);
     }    
-    ThisThread::sleep_for(50ms);
+    wait(0.05);
   } 
 }
-
-
+ 
+// // Run to log data
 int main() {
     // mymotor.setSpeed(0.0);
-    // suspend();
-    // wait_sequence();
-    // thread1.start(sensor_thread);
-    // thread2.start(encoder_thread);
+    suspend();
+    wait_sequence();
+    thread1.start(sensor_thread_raw);
+    // thread2.start(encoder_thread_raw);
     // thread3.start(motor_thread);
-    // thread4.start(log_thread);
-    // Dummy snapshot
-    LogDataRaw snapshot = {};
-    snapshot.encoder.timestamp = 123456;
-    snapshot.encoder.encoder1_raw = 2048;
-    snapshot.encoder.encoder2_raw = -1024;
-
-    snapshot.bno055.timestamp = 654321;
-    snapshot.bno055.acc = {0, 100, -100, 50};
-    snapshot.bno055.gyr = {0, -50, 25, 10};
-    snapshot.bno055.mag = {0, 500, 500, 500};
-    snapshot.bno055.eul = {0, 90, 0, 0};
-    snapshot.bno055.lin = {0, 0, 0, 100};
-    snapshot.bno055.grav = {0, 0, 0, 1024};
-    snapshot.bno055.quat = {1000, 0, 0, 0};
-    snapshot.tmp.temp_raw = 400;  // 25.0 °C
-
-    uint32_t write_address = 0x000000;
-    f.eraseSector(write_address);  // ✅ Erase 4KB sector before writing
-
-    // Encode
-    uint8_t buffer[128];
-    uint8_t* ptr = buffer;
-    uint8_t flags = 0x01 | 0x02;
-    *ptr++ = flags;
-
-    memcpy(ptr, &snapshot.encoder.timestamp, sizeof(uint32_t)); ptr += 4;
-    memcpy(ptr, &snapshot.encoder.encoder1_raw, sizeof(int16_t)); ptr += 2;
-    memcpy(ptr, &snapshot.encoder.encoder2_raw, sizeof(int16_t)); ptr += 2;
-
-    memcpy(ptr, &snapshot.bno055.timestamp, sizeof(uint32_t)); ptr += 4;
-
-    auto write_vec = [&](const bno055_raw_vector_t& v, bool with_w = false) {
-        if (with_w) { memcpy(ptr, &v.w, 2); ptr += 2; }
-        memcpy(ptr, &v.x, 2); ptr += 2;
-        memcpy(ptr, &v.y, 2); ptr += 2;
-        memcpy(ptr, &v.z, 2); ptr += 2;
-    };
-
-    write_vec(snapshot.bno055.acc);
-    write_vec(snapshot.bno055.gyr);
-    write_vec(snapshot.bno055.mag);
-    write_vec(snapshot.bno055.eul);
-    write_vec(snapshot.bno055.lin);
-    write_vec(snapshot.bno055.grav);
-    write_vec(snapshot.bno055.quat, true);
-
-    memcpy(ptr, &snapshot.tmp.temp_raw, sizeof(int16_t)); ptr += 2;
-
-    size_t entry_size = ptr - buffer;
-    f.write(write_address, buffer, entry_size);
-
-    // Read and decode
-    uint8_t read_buffer[128] = {0};
-    f.read(write_address, read_buffer, entry_size);
-    decode(read_buffer, entry_size);
-
-    return 0;
-
+    thread4.start(log_thread_raw);
 }
+
+
+// Run to read data out
+// int main() {
+//     ThisThread::sleep_for(5000ms);
+//     uint32_t addr = FLASH_LOG_START_ADDR;
+//     serial.printf("Starting\n");
+
+//     while (true) {
+//         serial.printf("%u", addr);
+//         uint8_t flags = 0xFF;
+//         f.read(addr, &flags, 1);
+
+//         if (flags == 0xFF) {
+//             break;
+//         }
+
+//         size_t entry_size = 1;
+//         if (flags & 0x01) entry_size += 4 + 2 + 2;
+//         if (flags & 0x02) entry_size += 4 + 6 * 3 * 2 + 4 * 2 + 2;
+
+//         if (entry_size > 128) break;
+
+//         uint8_t entry[128];
+//         f.read(addr, entry, entry_size);
+
+//         decode(entry, entry_size); // Readable Printout
+//         decodeCSV(entry, entry_size); // CSV Printout
+
+//         addr += entry_size;
+//         ThisThread::sleep_for(100ms);
+//     }
+
+//     serial.printf("# END OF LOG\n");
+//     ThisThread::sleep_for(1000ms);
+// }
