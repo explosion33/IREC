@@ -459,11 +459,69 @@ void scanI2C() {
 
 
 int main() {
-    mymotor.setSpeed(0.0);
-    suspend();
-    wait_sequence();
-    thread1.start(sensor_thread);
-    thread2.start(encoder_thread);
-    thread3.start(motor_thread);
-    thread4.start(log_thread);
+    // mymotor.setSpeed(0.0);
+    // suspend();
+    // wait_sequence();
+    // thread1.start(sensor_thread);
+    // thread2.start(encoder_thread);
+    // thread3.start(motor_thread);
+    // thread4.start(log_thread);
+    // Dummy snapshot
+    LogDataRaw snapshot = {};
+    snapshot.encoder.timestamp = 123456;
+    snapshot.encoder.encoder1_raw = 2048;
+    snapshot.encoder.encoder2_raw = -1024;
+
+    snapshot.bno055.timestamp = 654321;
+    snapshot.bno055.acc = {0, 100, -100, 50};
+    snapshot.bno055.gyr = {0, -50, 25, 10};
+    snapshot.bno055.mag = {0, 500, 500, 500};
+    snapshot.bno055.eul = {0, 90, 0, 0};
+    snapshot.bno055.lin = {0, 0, 0, 100};
+    snapshot.bno055.grav = {0, 0, 0, 1024};
+    snapshot.bno055.quat = {1000, 0, 0, 0};
+    snapshot.tmp.temp_raw = 400;  // 25.0 °C
+
+    uint32_t write_address = 0x000000;
+    f.eraseSector(write_address);  // ✅ Erase 4KB sector before writing
+
+    // Encode
+    uint8_t buffer[128];
+    uint8_t* ptr = buffer;
+    uint8_t flags = 0x01 | 0x02;
+    *ptr++ = flags;
+
+    memcpy(ptr, &snapshot.encoder.timestamp, sizeof(uint32_t)); ptr += 4;
+    memcpy(ptr, &snapshot.encoder.encoder1_raw, sizeof(int16_t)); ptr += 2;
+    memcpy(ptr, &snapshot.encoder.encoder2_raw, sizeof(int16_t)); ptr += 2;
+
+    memcpy(ptr, &snapshot.bno055.timestamp, sizeof(uint32_t)); ptr += 4;
+
+    auto write_vec = [&](const bno055_raw_vector_t& v, bool with_w = false) {
+        if (with_w) { memcpy(ptr, &v.w, 2); ptr += 2; }
+        memcpy(ptr, &v.x, 2); ptr += 2;
+        memcpy(ptr, &v.y, 2); ptr += 2;
+        memcpy(ptr, &v.z, 2); ptr += 2;
+    };
+
+    write_vec(snapshot.bno055.acc);
+    write_vec(snapshot.bno055.gyr);
+    write_vec(snapshot.bno055.mag);
+    write_vec(snapshot.bno055.eul);
+    write_vec(snapshot.bno055.lin);
+    write_vec(snapshot.bno055.grav);
+    write_vec(snapshot.bno055.quat, true);
+
+    memcpy(ptr, &snapshot.tmp.temp_raw, sizeof(int16_t)); ptr += 2;
+
+    size_t entry_size = ptr - buffer;
+    f.write(write_address, buffer, entry_size);
+
+    // Read and decode
+    uint8_t read_buffer[128] = {0};
+    f.read(write_address, read_buffer, entry_size);
+    decode(read_buffer, entry_size);
+
+    return 0;
+
 }
