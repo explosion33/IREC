@@ -3,6 +3,7 @@
 #include "func.h"
 #include "EUSBSerial.h"
 #include "motor.h"
+#include "Servo.h"
 #include "tmp102.h"
 #include "flash.h"
 #include "onboard.h"
@@ -15,10 +16,10 @@
 // System Parameters
 #define WATCHDOG_TIMEOUT_MS 5000
 #define MOTOR_SPEED 0.5
-#define SENSOR_INTERVAL chrono::milliseconds(10)
+#define SENSOR_INTERVAL chrono::milliseconds(100)
 #define ENCODER_INTERVAL chrono::milliseconds(10)
-#define LOG_INTERVAL chrono::milliseconds(1000)
-#define ENCODER_PPM 4096
+#define LOG_INTERVAL chrono::milliseconds(100)
+#define ENCODER_PPM 2048
 
 DigitalOut led (PA_9); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
@@ -26,11 +27,12 @@ EUSBSerial serial(0x3232, 0x1);
 //USBSerial serial;
 
 // // Sensors
-BNO055 bno (PB_4, PA_8, 0x50);
+BNO055 bno (PB_7, PB_6, 0x50);
 tmp102 tmp(PB_4, PA_8, 0x91);
-Motor mymotor(PA_15); // motor pwm pin
+Motor mymotor(PA_7); // motor pwm pin
+Servo myservo(PA_15);
 flash f (PA_7, PA_6, PA_5, PA_4);
-encoder e1 (PA_8, PA_9, 4096);
+encoder e1 (PA_8, PA_9, 2048);
 //encoder e2 (PA_8, PA_9, 1024);
 
 // TODO: figure out operating frequencies to get system fully functional with no errors
@@ -135,7 +137,7 @@ LogData logdata;
 LogDataRaw logdataraw;
 
 void motor_thread() {
-    mymotor.setSpeed(MOTOR_SPEED);
+    //mymotor.setSpeed(MOTOR_SPEED);
 }
 
 void sensor_thread() {
@@ -410,7 +412,7 @@ void suspend() {
 void setup() {
     bno.setup();
     tmp.turnOn();
-    //mymotor.arm();
+    mymotor.arm();
 }
 
 void wait_sequence() {
@@ -454,15 +456,14 @@ void scanI2C() {
     ThisThread::sleep_for(50ms);
   } 
 }
+
+
 int main() {
-    //setup();
-    // suspend();
-    // wait_sequence();
-    // thread1.start(sensor_thread);
-    // // thread2.start(encoder_thread);
-    // // thread3.start(motor_thread);
-    // thread4.start(log_thread);
-    while (true) {
-        serial.printf("testing\n");
-    }
+    mymotor.setSpeed(0.0);
+    suspend();
+    wait_sequence();
+    thread1.start(sensor_thread);
+    thread2.start(encoder_thread);
+    thread3.start(motor_thread);
+    thread4.start(log_thread);
 }

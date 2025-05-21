@@ -45,20 +45,59 @@ void flash::csHigh() {
  * @param length - Number of bytes to write
  */
 void flash::write(uint32_t address, const uint8_t *buffer, size_t length) {
-    enableWrite(); // Required before any write
+    // enableWrite(); // Required before any write
 
-    uint8_t cmd[4];
-    cmd[0] = 0x02; // Page Program command
-    cmd[1] = (address >> 16) & 0xFF;
-    cmd[2] = (address >> 8) & 0xFF;
-    cmd[3] = address & 0xFF;
+    // uint8_t cmd[4];
+    // cmd[0] = 0x02; // Page Program command
+    // cmd[1] = (address >> 16) & 0xFF;
+    // cmd[2] = (address >> 8) & 0xFF;
+    // cmd[3] = address & 0xFF;
 
-    csLow();
-    _spi.write((const char *)cmd, 4, NULL, 0);
-    _spi.write((const char *)buffer, length, NULL, 0);
-    csHigh();
+    // csLow();
+    // _spi.write((const char *)cmd, 4, NULL, 0);
+    // _spi.write((const char *)buffer, length, NULL, 0);
+    // csHigh();
 
-    wait_us(5000); // Allow time for write cycle
+    // wait_us(5000); // Allow time for write cycle
+    while (length > 0) {
+        // Enable writing for each Page Program operation
+        enableWrite();
+
+        // Calculate offset within the current page
+        uint32_t page_offset = address % 256;
+        uint32_t bytes_to_page_end = 256 - page_offset;
+
+        // Don't write past the current page
+        size_t chunk = (length < bytes_to_page_end) ? length : bytes_to_page_end;
+
+        // Construct 0x02 Page Program command
+        uint8_t cmd[4];
+        cmd[0] = 0x02; // Page Program
+        cmd[1] = (address >> 16) & 0xFF;
+        cmd[2] = (address >> 8) & 0xFF;
+        cmd[3] = address & 0xFF;
+
+        csLow();
+        _spi.write((const char*)cmd, 4, nullptr, 0);
+        _spi.write((const char*)buffer, chunk, nullptr, 0);
+        csHigh();
+
+        // Wait until flash reports it's done
+        uint8_t rd = 0x05;     // Read Status Register
+        uint8_t status = 0;
+
+        do {
+            csLow();
+            _spi.write((const char*)&rd, 1, nullptr, 0);
+            _spi.write(nullptr, 0, (char*)&status, 1);
+            csHigh();
+        } while (status & 0x01); // WIP (write-in-progress) bit set
+
+        // Update pointers and counters
+        address += chunk;
+        buffer += chunk;
+        length -= chunk;
+    }
 }
 
 /**
