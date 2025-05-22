@@ -120,7 +120,8 @@ enum class State {
     Idle,
     Setup,
     Reset,
-    Main
+    Main,
+    Decode
 };
 
 LogData logdata;
@@ -471,105 +472,147 @@ void suspend() {
 }
 
 void setup() {
-    bno.setup();
+    //bno.setup(); 
+    bno.writeData(0x3D, 0x00, 1); // OPR_MODE = CONFIGMODE
+    ThisThread::sleep_for(25ms);
+
+    // 2. Perform a system reset
+    bno.writeData(0x3F, 0x20, 1); // SYS_TRIGGER = RESET
+    ThisThread::sleep_for(650ms); // Wait for reboot
+
+    // 3. Set the power mode to normal
+    bno.writeData(0x3E, 0x00, 1); // PWR_MODE = Normal
+    ThisThread::sleep_for(10ms);
+
+    // 4. Set the page to 0 (in case it's not already)
+    bno.writeData(0x07, 0x00, 1); // PAGE_ID = 0
+    ThisThread::sleep_for(10ms);
+
+    // 6. Set the operation mode (e.g., IMU mode: accelerometer + gyroscope)
+    bno.writeData(0x3D, 0x0C, 1); // OPR_MODE = IMU mode
+    ThisThread::sleep_for(20ms);   
     tmp.turnOn();
     //mymotor.arm();
+
 }
 
 void wait_sequence() {
     State fsm_state = State::Idle;
     char cmd_buffer[32];
-
+    
     while (true) {
         switch(fsm_state) {
-            case State::Idle:
+            case State::Idle: {
+                static Timer idle_timer;
+                static bool timer_started = false;
+
+                if (!timer_started) {
+                    idle_timer.start();
+                    timer_started = true;
+                }
+
                 if (serial.readline(cmd_buffer, sizeof(cmd_buffer))) {
-                    if (strcmp(cmd_buffer, "start") == 0) {
-                        fsm_state = State::Setup;
-                        serial.printf("start received\n");
-                    } else if (strcmp(cmd_buffer, "erase") == 0) {
+                    idle_timer.reset();
+
+                    if (strcmp(cmd_buffer, "clear") == 0) {
                         fsm_state = State::Reset;
-                        serial.printf("erase\n");
+                        serial.printf("clear received\n");
+                        timer_started = false;
+                    } else if (strcmp(cmd_buffer, "log") == 0) {
+                        fsm_state = State::Decode;
+                        serial.printf("log received\n");
+                        timer_started = false;
+                    } else if (strcmp(cmd_buffer, "start") == 0) {
+                        fsm_state = State::Setup;
+                        serial.printf("starting");
+                        timer_started = false;
                     }
+                } else if (idle_timer.elapsed_time() > 60s) {
+                    fsm_state = State::Setup;
+                    serial.printf("timeout -> reset\n");
+                    idle_timer.stop();
+                    idle_timer.reset();
+                    timer_started = false;
                 }
 
                 ThisThread::sleep_for(10ms);
                 break;
+            }
 
             case State::Reset:
                 f.eraseAll();
-                fsm_state = State::Setup;
-                break;
+                serial.printf("Flash Cleared, exiting\n");
+                exit(0);
 
 
-            case State::Setup:  
+            case State::Setup:
                 setup();
                 fsm_state = State::Main;
+                ThisThread::sleep_for(1000ms);
                 break;
 
             case State::Main:
                 return;
+
+            case State::Decode:
+                uint32_t addr = FLASH_LOG_START_ADDR;
+                serial.printf("Starting\n");
+
+                while (true) {
+                    serial.printf("%u", addr);
+                    uint8_t flags = 0xFF;
+                    f.read(addr, &flags, 1);
+
+                    if (flags == 0xFF) {
+                        break;
+                    }
+
+                    size_t entry_size = 1;
+                    if (flags & 0x01){
+                         entry_size += 4 + 2 + 2;
+                    }
+                    if (flags & 0x02){
+                        entry_size += 4 + 6 * 3 * 2 + 4 * 2 + 2;
+                    }
+
+                    if (entry_size > 128) break;
+
+                    uint8_t entry[128];
+                    f.read(addr, entry, entry_size);
+
+                    //decode(entry, entry_size); // Readable Printout
+                    decodeCSV(entry, entry_size); // CSV Printout
+
+                    addr += entry_size;
+                    ThisThread::sleep_for(100ms);
+                }
+
+                serial.printf("# END OF LOG\n");
+                exit(0);
         }
         
     }
 }
-I2C i2c(PB_4, PA_8);  
 
+I2C i2c (PB_4, PA_8);
 int ack;   
 int address;  
 void scanI2C() {
-  for(address=1;address<255;address++) {    
+  for(address=1;address<127;address++) {    
     ack = i2c.write(address, "11", 1);
     if (ack == 0) {
-        serial.printf("\tFound at %3d -- %3x\r\n", address,address);
+       serial.printf("\tFound at %3d -- %3x\r\n", address,address);
     }    
     wait(0.05);
   } 
 }
- 
 // // Run to log data
 int main() {
     // mymotor.setSpeed(0.0);
-    suspend();
-    wait_sequence();
+    //suspend();
+    wait_sequence();;
     thread1.start(sensor_thread_raw);
-    // thread2.start(encoder_thread_raw);
-    // thread3.start(motor_thread);
+    // // thread2.start(encoder_thread_raw);
+    // // thread3.start(motor_thread);
     thread4.start(log_thread_raw);
 }
-
-
-// Run to read data out
-// int main() {
-//     ThisThread::sleep_for(5000ms);
-//     uint32_t addr = FLASH_LOG_START_ADDR;
-//     serial.printf("Starting\n");
-
-//     while (true) {
-//         serial.printf("%u", addr);
-//         uint8_t flags = 0xFF;
-//         f.read(addr, &flags, 1);
-
-//         if (flags == 0xFF) {
-//             break;
-//         }
-
-//         size_t entry_size = 1;
-//         if (flags & 0x01) entry_size += 4 + 2 + 2;
-//         if (flags & 0x02) entry_size += 4 + 6 * 3 * 2 + 4 * 2 + 2;
-
-//         if (entry_size > 128) break;
-
-//         uint8_t entry[128];
-//         f.read(addr, entry, entry_size);
-
-//         decode(entry, entry_size); // Readable Printout
-//         decodeCSV(entry, entry_size); // CSV Printout
-
-//         addr += entry_size;
-//         ThisThread::sleep_for(100ms);
-//     }
-
-//     serial.printf("# END OF LOG\n");
-//     ThisThread::sleep_for(1000ms);
-// }
