@@ -52,6 +52,7 @@ Thread thread1;
 Thread thread2;
 Thread thread3;
 Thread thread4;
+Thread thread5;
 Mutex logMutex;
 
 struct EncoderData{
@@ -594,6 +595,13 @@ void wait_sequence() {
     }
 }
 
+void led_thread() {
+    while (true) {
+        led = !led;
+        ThisThread::sleep_for(100ms);
+    }
+}
+
 I2C i2c (PB_4, PA_8);
 int ack;   
 int address;  
@@ -615,4 +623,5 @@ int main() {
     // // thread2.start(encoder_thread_raw);
     // // thread3.start(motor_thread);
     thread4.start(log_thread_raw);
+    thread5.start(led_thread);
 }
