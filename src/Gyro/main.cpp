@@ -33,7 +33,8 @@ EUSBSerial serial(0x3232, 0x1);
 // Sensors
 BNO055 bno (PB_4, PA_8, 0x50);
 tmp102 tmp(PB_4, PA_8, 0x91);
-PwmOut pwm (PA_15);
+//PwmOut pwm (PA_15);
+Motor mymotor (PA_15);
 
 flash f (PA_7, PA_6, PA_5, PA_4);
 encoder e1 (PA_8, PA_9, 2048);
@@ -131,7 +132,8 @@ LogData logdata;
 LogDataRaw logdataraw;
 
 void motor_thread() {
-    pwm.pulsewidth_us(1500);
+    //pwm.pulsewidth_us(1500);
+    mymotor.setSpeed(MOTOR_PERCENT);
 }
 
 void sensor_thread() {
@@ -475,10 +477,11 @@ void suspend() {
 }
 
 void setup() {
-    pwm.pulsewidth_us(2000);
-    ThisThread::sleep_for(1000ms);
-    pwm.pulsewidth_us(1000);
-    ThisThread::sleep_for(1000ms);
+    // pwm.pulsewidth_us(2000);
+    // ThisThread::sleep_for(1000ms);
+    // pwm.pulsewidth_us(1000);
+    // ThisThread::sleep_for(1000ms);
+    mymotor.arm();
     bno.writeData(0x3E, 0x00, 1); // PWR_MODE = Normal
     ThisThread::sleep_for(10ms);
 
@@ -610,12 +613,12 @@ void scanI2C() {
     if (ack == 0) {
        serial.printf("\tFound at %3d -- %3x\r\n", address,address);
     }    
-    wait(0.05);
+    ThisThread::sleep_for(50ms);
   } 
 }
 // Run to log data
 int main() {
-    pwm.period_ms(20);
+    //pwm.period_ms(20);
     //suspend();
     wait_sequence();;
     thread1.start(sensor_thread);

@@ -10,15 +10,10 @@ Motor::Motor(PinName pin)
 }
 
 void Motor::arm() {
-    _servo.write(0.0f);                     // Minimum throttle
-    ThisThread::sleep_for(500ms);
-
-    _servo.write(1.0f);                     // Maximum throttle
-    
-    ThisThread::sleep_for(6000ms);
-
-    _servo.write(0.0f);                     // Back to minimum
-    ThisThread::sleep_for(6000ms);
+    _servo.write(1.0);
+    ThisThread::sleep_for(1000ms);
+    _servo.write(0.0);
+    ThisThread::sleep_for(1000ms);
 }
 
 /**
