@@ -18,11 +18,12 @@
 #define MOTOR_SPEED 0.5
 #define SENSOR_INTERVAL chrono::milliseconds(50)
 #define ENCODER_INTERVAL chrono::milliseconds(10)
-#define LOG_INTERVAL chrono::milliseconds(100)
+#define LOG_INTERVAL chrono::milliseconds(500)
 #define ENCODER_PPM 2048
 #define MAX_LOG_BYTES 0x10000
 #define ENTRY_SIZE 51
 #define FLASH_LOG_START_ADDR 0x0000
+#define MOTOR_PERCENT 1.0
 
 DigitalOut led (PA_9); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
@@ -32,7 +33,8 @@ EUSBSerial serial(0x3232, 0x1);
 // Sensors
 BNO055 bno (PB_4, PA_8, 0x50);
 tmp102 tmp(PB_4, PA_8, 0x91);
-Servo myservo(PA_15);
+PwmOut pwm (PA_15);
+
 flash f (PA_7, PA_6, PA_5, PA_4);
 encoder e1 (PA_8, PA_9, 2048);
 encoder e2 (PB_6, PB_7, 2048);
@@ -129,7 +131,7 @@ LogData logdata;
 LogDataRaw logdataraw;
 
 void motor_thread() {
-    //mymotor.setSpeed(MOTOR_SPEED);
+    pwm.pulsewidth_us(1500);
 }
 
 void sensor_thread() {
@@ -473,28 +475,25 @@ void suspend() {
 }
 
 void setup() {
-    //bno.setup(); 
-    bno.writeData(0x3D, 0x00, 1); // OPR_MODE = CONFIGMODE
-    ThisThread::sleep_for(25ms);
-
-    // 2. Perform a system reset
-    bno.writeData(0x3F, 0x20, 1); // SYS_TRIGGER = RESET
-    ThisThread::sleep_for(650ms); // Wait for reboot
-
-    // 3. Set the power mode to normal
+    pwm.pulsewidth_us(2000);
+    ThisThread::sleep_for(1000ms);
+    pwm.pulsewidth_us(1000);
+    ThisThread::sleep_for(1000ms);
     bno.writeData(0x3E, 0x00, 1); // PWR_MODE = Normal
     ThisThread::sleep_for(10ms);
 
-    // 4. Set the page to 0 (in case it's not already)
+    bno.writeData(0x3D, 0x00, 1); // OPR_MODE = CONFIGMODE
+    ThisThread::sleep_for(25ms);
+
+    bno.writeData(0x3F, 0x20, 1); // SYS_TRIGGER = RESET
+    ThisThread::sleep_for(650ms);
+
     bno.writeData(0x07, 0x00, 1); // PAGE_ID = 0
     ThisThread::sleep_for(10ms);
 
-    // 6. Set the operation mode (e.g., IMU mode: accelerometer + gyroscope)
-    bno.writeData(0x3D, 0x0C, 1); // OPR_MODE = IMU mode
+    bno.writeData(0x3D, 0x0C, 1); // OPR_MODE = NDOF
     ThisThread::sleep_for(20ms);   
     tmp.turnOn();
-    //mymotor.arm();
-
 }
 
 void wait_sequence() {
@@ -614,14 +613,14 @@ void scanI2C() {
     wait(0.05);
   } 
 }
-// // Run to log data
+// Run to log data
 int main() {
-    // mymotor.setSpeed(0.0);
+    pwm.period_ms(20);
     //suspend();
     wait_sequence();;
-    thread1.start(sensor_thread_raw);
-    // // thread2.start(encoder_thread_raw);
-    // // thread3.start(motor_thread);
-    thread4.start(log_thread_raw);
-    thread5.start(led_thread);
+    thread1.start(sensor_thread);
+    thread2.start(encoder_thread);
+    thread3.start(motor_thread);
+    thread4.start(log_thread);
+    //thread5.start(led_thread);
 }
