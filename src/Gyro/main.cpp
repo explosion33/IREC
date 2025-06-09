@@ -10,7 +10,9 @@
 #include "encoder.h"
 #include "USBSerial.h"  
 #include "bno055_const.h"
+#include "radio.h"
 #include <chrono>
+#include <string>
 
 
 // System Parameters
@@ -18,37 +20,38 @@
 #define MOTOR_SPEED 0.5
 #define SENSOR_INTERVAL chrono::milliseconds(50)
 #define ENCODER_INTERVAL chrono::milliseconds(10)
-#define LOG_INTERVAL chrono::milliseconds(500)
+#define LOG_INTERVAL chrono::milliseconds(200)
 #define ENCODER_PPM 2048
 #define MAX_LOG_BYTES 0x10000
 #define ENTRY_SIZE 51
 #define FLASH_LOG_START_ADDR 0x0000
-#define MOTOR_PERCENT 1.0
+#define MOTOR_PERCENT 0.4
+#define TIMEOUT_DURATION chrono::seconds(3600)
 
 DigitalOut led (PA_9); // Onboard LED
 DigitalOut rst(PA_5); // RST pin for the BNO055
 EUSBSerial serial(0x3232, 0x1);
+BufferedSerial uart (PA_2, PA_3, 115200);
 //USBSerial serial;
 
 // Sensors
 BNO055 bno (PB_4, PA_8, 0x50);
 tmp102 tmp(PB_4, PA_8, 0x91);
-//PwmOut pwm (PA_15);
 Motor mymotor (PA_15);
 
 flash f (PA_7, PA_6, PA_5, PA_4);
-encoder e1 (PA_8, PA_9, 2048);
-encoder e2 (PB_6, PB_7, 2048);
+encoder e1 (PB_6, PB_8, 2048);
+encoder e2 (PB_7, PB_9, 2048);
 
 // watchdog stuff
-Watchdog &watchdog = Watchdog::get_instance();
-void watchdog_thread() {
-    watchdog.start(WATCHDOG_TIMEOUT_MS);
-    while (true) {
-        watchdog.kick();
-        ThisThread::sleep_for(1000ms);
-    }
-}
+// Watchdog &watchdog = Watchdog::get_instance();
+// void watchdog_thread() {
+//     watchdog.start(WATCHDOG_TIMEOUT_MS);
+//     while (true) {
+//         watchdog.kick();
+//         ThisThread::sleep_for(1000ms);
+//     }
+// }
 
 
 Thread thread1;
@@ -125,6 +128,7 @@ enum class State {
     Setup,
     Reset,
     Main,
+    Timeout,
     Decode
 };
 
@@ -134,6 +138,14 @@ LogDataRaw logdataraw;
 void motor_thread() {
     //pwm.pulsewidth_us(1500);
     mymotor.setSpeed(MOTOR_PERCENT);
+    Timer tmotor;
+    tmotor.start();
+    while (tmotor.read() < 180) {
+        ThisThread::sleep_for(100ms);
+    }
+    tmotor.stop();
+    mymotor.setSpeed(0.0);
+    
 }
 
 void sensor_thread() {
@@ -146,7 +158,7 @@ void sensor_thread() {
         bno055_vector_t grav = bno.getGravity();
         bno055_vector_t quat = bno.getQuaternion();
         
-        float temp = tmp.getTempCelsius();
+        float temp = tmp.getTempCelsius() - 10;
         uint64_t timestamp_us = Kernel::Clock::now().time_since_epoch().count();
 
         logMutex.lock();
@@ -476,12 +488,14 @@ void suspend() {
     tmp.shutDown(); // SD mode
 }
 
-void setup() {
+void setup(bool motor) {
     // pwm.pulsewidth_us(2000);
     // ThisThread::sleep_for(1000ms);
     // pwm.pulsewidth_us(1000);
     // ThisThread::sleep_for(1000ms);
-    mymotor.arm();
+    if (motor) {
+        mymotor.arm();
+    }
     bno.writeData(0x3E, 0x00, 1); // PWR_MODE = Normal
     ThisThread::sleep_for(10ms);
 
@@ -495,10 +509,11 @@ void setup() {
     ThisThread::sleep_for(10ms);
 
     bno.writeData(0x3D, 0x0C, 1); // OPR_MODE = NDOF
-    ThisThread::sleep_for(20ms);   
+    ThisThread::sleep_for(20ms);
     tmp.turnOn();
-}
 
+    // write(&uart, data, len); setup radio commands
+}
 void wait_sequence() {
     State fsm_state = State::Idle;
     char cmd_buffer[32];
@@ -513,7 +528,32 @@ void wait_sequence() {
                     idle_timer.start();
                     timer_started = true;
                 }
+                // radio input commands
+                if (uart.readable()) {
+                    char uart_buf[256];
+                    std::string message;
 
+                    ssize_t n = uart.read(uart_buf, sizeof(uart_buf));
+                    if (n > 0) {
+                        if (parse(uart_buf, n, message)) {
+                            std::string msg = "ok";
+                            for (int i = 0; i < 5; i++){
+                                writeUART(&uart, reinterpret_cast<const uint8_t*>(message.c_str()), msg.length());
+                            }
+                            if (strcmp(message.c_str(), "clear") == 0) {
+                                fsm_state = State::Reset;
+                                serial.printf("clear received\n");
+                            } else if (strcmp(message.c_str(), "log") == 0) {
+                                fsm_state = State::Decode;
+                                serial.printf("log received\n");
+                            } else if (strcmp(message.c_str(), "start") == 0) {
+                                fsm_state = State::Setup;
+                                serial.printf("starting");
+                            }
+                        }
+                    }
+
+                }    
                 if (serial.readline(cmd_buffer, sizeof(cmd_buffer))) {
                     idle_timer.reset();
 
@@ -527,12 +567,12 @@ void wait_sequence() {
                         timer_started = false;
                     } else if (strcmp(cmd_buffer, "start") == 0) {
                         fsm_state = State::Setup;
-                        serial.printf("starting");
+                        serial.printf("starting\n");
                         timer_started = false;
                     }
-                } else if (idle_timer.elapsed_time() > 60s) {
-                    fsm_state = State::Setup;
-                    serial.printf("timeout -> reset\n");
+                } else if (idle_timer.elapsed_time() > TIMEOUT_DURATION) {
+                    fsm_state = State::Timeout;
+                    serial.printf("timeout\n");
                     idle_timer.stop();
                     idle_timer.reset();
                     timer_started = false;
@@ -549,7 +589,13 @@ void wait_sequence() {
 
 
             case State::Setup:
-                setup();
+                setup(true);
+                fsm_state = State::Main;
+                ThisThread::sleep_for(1000ms);
+                break;
+
+            case State::Timeout:
+                setup(false);
                 fsm_state = State::Main;
                 ThisThread::sleep_for(1000ms);
                 break;
@@ -618,12 +664,11 @@ void scanI2C() {
 }
 // Run to log data
 int main() {
-    //pwm.period_ms(20);
-    //suspend();
-    wait_sequence();;
-    thread1.start(sensor_thread);
-    thread2.start(encoder_thread);
+    suspend();
+    wait_sequence();
+    thread1.start(sensor_thread_raw);
+    thread2.start(encoder_thread_raw);
     thread3.start(motor_thread);
-    thread4.start(log_thread);
-    //thread5.start(led_thread);
+    thread4.start(log_thread_raw);
+    thread5.start(led_thread);
 }
