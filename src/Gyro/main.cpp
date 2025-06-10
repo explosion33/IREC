@@ -522,7 +522,7 @@ void setup(bool motor) {
     writeUART(&uart,reinterpret_cast<const uint8_t*>(filter.c_str()), filter.length());
     writeUART(&uart,reinterpret_cast<const uint8_t*>(dev.c_str()), dev.length());
     writeUART(&uart,reinterpret_cast<const uint8_t*>(mod.c_str()), mod.length());
-    writeUART(&uart,reinterpret_cast<const uint8_t*>(app.c_str()), .length());
+    writeUART(&uart,reinterpret_cast<const uint8_t*>(app.c_str()), app.length());
 }
 void wait_sequence() {
     State fsm_state = State::Idle;
