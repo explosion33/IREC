@@ -511,8 +511,18 @@ void setup(bool motor) {
     bno.writeData(0x3D, 0x0C, 1); // OPR_MODE = NDOF
     ThisThread::sleep_for(20ms);
     tmp.turnOn();
-
-    // write(&uart, data, len); setup radio commands
+    std::string freq = "+sfreq434000000";
+    std::string rate = "+srate38400";
+    std::string filter = "+sfilter104166";
+    std::string dev = "+sdev20000";
+    std::string mod = "+smod1";
+    std::string app = "+app";
+    writeUART(&uart,reinterpret_cast<const uint8_t*>(freq.c_str()), freq.length());
+    writeUART(&uart,reinterpret_cast<const uint8_t*>(rate.c_str()), rate.length());
+    writeUART(&uart,reinterpret_cast<const uint8_t*>(filter.c_str()), filter.length());
+    writeUART(&uart,reinterpret_cast<const uint8_t*>(dev.c_str()), dev.length());
+    writeUART(&uart,reinterpret_cast<const uint8_t*>(mod.c_str()), mod.length());
+    writeUART(&uart,reinterpret_cast<const uint8_t*>(app.c_str()), .length());
 }
 void wait_sequence() {
     State fsm_state = State::Idle;
@@ -538,7 +548,7 @@ void wait_sequence() {
                         if (parse(uart_buf, n, message)) {
                             std::string msg = "ok";
                             for (int i = 0; i < 5; i++){
-                                writeUART(&uart, reinterpret_cast<const uint8_t*>(message.c_str()), msg.length());
+                                writeUART(&uart, reinterpret_cast<const uint8_t*>(message.c_str()), message.length());
                             }
                             if (strcmp(message.c_str(), "clear") == 0) {
                                 fsm_state = State::Reset;
