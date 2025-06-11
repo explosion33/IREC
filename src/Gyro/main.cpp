@@ -138,14 +138,9 @@ LogDataRaw logdataraw;
 void motor_thread() {
     //pwm.pulsewidth_us(1500);
     mymotor.setSpeed(MOTOR_PERCENT);
-    Timer tmotor;
-    tmotor.start();
-    while (tmotor.read() < 180) {
+    while(true) {
         ThisThread::sleep_for(100ms);
     }
-    tmotor.stop();
-    mymotor.setSpeed(0.0);
-    
 }
 
 void sensor_thread() {
@@ -580,7 +575,7 @@ void wait_sequence() {
                         serial.printf("starting\n");
                         timer_started = false;
                     }
-                } else if (idle_timer.elapsed_time() > TIMEOUT_DURATION) {
+                } else if (idle_timer.elapsed_time() > 30s) {
                     fsm_state = State::Timeout;
                     serial.printf("timeout\n");
                     idle_timer.stop();
@@ -674,11 +669,11 @@ void scanI2C() {
 }
 // Run to log data
 int main() {
-    suspend();
+    //suspend();
     wait_sequence();
     thread1.start(sensor_thread_raw);
     thread2.start(encoder_thread_raw);
-    thread3.start(motor_thread);
+    //thread3.start(motor_thread);
     thread4.start(log_thread_raw);
     thread5.start(led_thread);
 }
